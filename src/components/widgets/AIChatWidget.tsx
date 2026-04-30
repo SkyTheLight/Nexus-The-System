@@ -50,10 +50,11 @@ export default function AIChatWidget() {
       })
 
       const data = await res.json()
+      console.log('Chat API response:', data)
 
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.response || 'Sorry, I couldn\'t process that.',
+        content: data.message || data.error || 'Sorry, I couldn\'t process that.',
         timestamp: Date.now()
       }
 
@@ -73,9 +74,6 @@ export default function AIChatWidget() {
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center gap-2 mb-3">
-        <svg viewBox="0 0 24 24" className="w-5 h-5 text-purple-400" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7-4.5-7-4.5v9z"/>
-        </svg>
         <span className="text-sm font-medium">AIRSE Chat</span>
       </div>
       <div className="flex-1 overflow-y-auto space-y-2 mb-3 pr-2">
@@ -84,11 +82,6 @@ export default function AIChatWidget() {
             key={idx}
             className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            {msg.role === 'assistant' && (
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-1">
-                <Bot size={14} className="text-white" />
-              </div>
-            )}
             <div
               className={`max-w-[80%] px-3 py-2 rounded-lg text-xs ${
                 msg.role === 'user'
@@ -98,18 +91,10 @@ export default function AIChatWidget() {
             >
               {msg.content}
             </div>
-            {msg.role === 'user' && (
-              <div className="w-6 h-6 rounded-full bg-[#2a2a3e] flex items-center justify-center flex-shrink-0 mt-1">
-                <User size={14} className="text-white/70" />
-              </div>
-            )}
           </div>
         ))}
         {loading && (
           <div className="flex gap-2 justify-start">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-1">
-              <Bot size={14} className="text-white" />
-            </div>
             <div className="bg-[#1a1a2e] border border-white/10 px-3 py-2 rounded-lg">
               <Loader2 size={14} className="animate-spin text-muted-foreground" />
             </div>

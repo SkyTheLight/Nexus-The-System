@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import QueryProvider from '@/components/QueryProvider'
 import { SearchWrapper } from '@/components/SearchWrapper'
-import JarvisChat from '@/components/JarvisChat'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,7 +22,6 @@ export default function RootLayout({
         <QueryProvider>
           <SearchWrapper>
             {children}
-            <JarvisChat />
           </SearchWrapper>
         </QueryProvider>
       </body>

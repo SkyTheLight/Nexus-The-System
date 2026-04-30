@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
-import XpBar from '@/components/XpBar'
 import TodoWidget from '@/components/widgets/TodoWidget'
 import GoalsWidget from '@/components/widgets/GoalsWidget'
 import IdeasWidget from '@/components/widgets/IdeasWidget'
@@ -26,7 +25,7 @@ import PomodoroTimer from '@/components/PomodoroTimer'
 import QuoteCarousel from '@/components/QuoteCarousel'
 import LiquidBackground from '@/components/LiquidBackground'
 import { getDashboardLayout, saveDashboardLayout, type DashboardWidget } from '@/lib/api'
-import { GripVertical, X, Plus } from 'lucide-react'
+import { GripVertical, Plus } from 'lucide-react'
 import {
   DndContext,
   closestCenter,
@@ -117,12 +116,6 @@ function SortableWidget({ widget, onHide }: { widget: DashboardWidget; onHide: (
             <GripVertical size={14} className="text-muted-foreground" />
           </div>
         </div>
-        <button
-          onClick={onHide}
-          className="p-1 hover:bg-red-500/20 rounded opacity-0 group-hover:opacity-100 transition-opacity text-red-400"
-        >
-          <X size={14} />
-        </button>
       </div>
       {WidgetComponent && <WidgetComponent />}
     </div>
@@ -245,8 +238,6 @@ export default function Home() {
       <main className="flex-1 ml-64 flex flex-col relative z-10">
         <TopBar />
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          <XpBar />
-
           <div className="mb-6">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Focus Board</h1>
             <p className="text-gray-300 mt-1">Your personal command center</p>

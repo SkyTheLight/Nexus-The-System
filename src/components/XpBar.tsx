@@ -22,7 +22,6 @@ export default function XpBar() {
         <span className={`${glitch ? 'animate-pulse' : ''} font-medium ${glitch ? 'text-purple-400' : ''}`}>
           Level {level}
         </span>
-        <span className="text-gray-400">{totalXp}/{xpForNextLevel} XP</span>
       </div>
       <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
         <div

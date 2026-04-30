@@ -7,7 +7,6 @@ import { Note } from '@/types'
 import { queryKeys } from '@/lib/queryKeys'
 import { Plus, Search, Trash2, Pencil, FileText } from 'lucide-react'
 import NotesEditor from './NotesEditor'
-import AddFloatingButton from '@/components/ui/add-floating-button'
 
 export default function NotesListUpgraded() {
   const queryClient = useQueryClient()
@@ -153,7 +152,6 @@ export default function NotesListUpgraded() {
         </div>
       )}
 
-      <AddFloatingButton onClick={handleFloatingAdd} label="New Note" />
     </div>
   )
 }
