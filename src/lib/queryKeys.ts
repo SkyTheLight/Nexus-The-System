@@ -1,0 +1,18 @@
+export const queryKeys = {
+  all: ['app'] as const,
+  tasks: () => [...queryKeys.all, 'tasks'] as const,
+  tasksFiltered: (filter: string) => [...queryKeys.tasks(), filter] as const,
+  task: (id: string) => [...queryKeys.tasks(), id] as const,
+  ideas: () => [...queryKeys.all, 'ideas'] as const,
+  idea: (id: string) => [...queryKeys.ideas(), id] as const,
+  goals: () => [...queryKeys.all, 'goals'] as const,
+  goal: (id: string) => [...queryKeys.goals(), id] as const,
+  certificates: () => [...queryKeys.all, 'certificates'] as const,
+  certificate: (id: string) => [...queryKeys.certificates(), id] as const,
+  notes: () => [...queryKeys.all, 'notes'] as const,
+  note: (id: string) => [...queryKeys.notes(), id] as const,
+  music: () => [...queryKeys.all, 'music'] as const,
+  devEntries: () => [...queryKeys.all, 'dev_entries'] as const,
+  performanceEntries: () => [...queryKeys.all, 'performance_entries'] as const,
+  dashboardLayout: () => [...queryKeys.all, 'dashboard_layout'] as const,
+}

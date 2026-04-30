@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* JARVIS AI Profile Animation - Simplified & Working */
+.jarvis-ai-container {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jarvis-orb {
+  position: absolute;
+  border-radius: 50%;
+  animation: orb-float 3s ease-in-out infinite;
+}
+
+.jarvis-orb-1 {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at 30% 30%, #79e3ee, #4a90e2);
+  animation-delay: 0s;
+}
+
+.jarvis-orb-2 {
+  width: 35px;
+  height: 35px;
+  background: radial-gradient(circle at 30% 30%, #ef788c, #e74c3c);
+  animation-delay: 0.5s;
+}
+
+.jarvis-orb-3 {
+  width: 25px;
+  height: 25px;
+  background: radial-gradient(circle at 30% 30%, #eb7fc6, #9b59b6);
+  animation-delay: 1s;
+}
+
+.jarvis-orb-4 {
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle at 30% 30%, #6d67c8, #3498db);
+  animation-delay: 1.5s;
+}
+
+@keyframes orb-float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(5px, -5px) scale(1.1);
+  }
+  50% {
+    transform: translate(-3px, 3px) scale(0.95);
+    opacity: 0.7;
+  }
+  75% {
+    transform: translate(3px, 5px) scale(1.05);
+  }
+}
+
+.jarvis-ring {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  animation: ring-rotate 4s linear infinite;
+}
+
+.jarvis-ring-1 {
+  border-top-color: #79e3ee;
+  border-right-color: #79e3ee;
+}
+
+.jarvis-ring-2 {
+  border-bottom-color: #ef788c;
+  border-left-color: #ef788c;
+  animation-direction: reverse;
+  animation-duration: 5s;
+}
+
+@keyframes ring-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Thinking Animation */
+.jarvis-thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jarvis-thinking-orb {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: think-pulse 1.4s ease-in-out infinite;
+}
+
+.jarvis-thinking-orb:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.jarvis-thinking-orb:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes think-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+* {
+  border-color: #1a1a1a;
+}
+
+body {
+  background: #000000;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #262626;
+}
+
+/* React Grid Layout styles */
+.react-grid-item.react-grid-placeholder {
+  background: #1a1a1a;
+  border-radius: 8px;
+  opacity: 0.5;
+}
+
+.react-grid-item > .react-resizable-handle {
+  background: transparent;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  border-right: 2px solid #262626;
+  border-bottom: 2px solid #262626;
+}
