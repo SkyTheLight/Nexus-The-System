@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSB } from '@/lib/api'
 
-const supabase = getSB()
-
 export const runtime = 'nodejs'
 
 // Table name mapping (AI-friendly names -> actual DB table names)

@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
+
+export const runtime = 'nodejs'
 
 export async function GET() {
   try {
-    const client = getSupabaseAdmin()
+    const client = getSupabase()
     if (!client) {
       return NextResponse.json({ error: 'Supabase client not initialized' }, { status: 500 })
     }
