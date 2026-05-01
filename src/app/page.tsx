@@ -35,7 +35,7 @@ import QuoteCarousel from '@/components/QuoteCarousel'
 import LiquidBackground from '@/components/LiquidBackground'
 import { getDashboardLayout, saveDashboardLayout, type DashboardWidget } from '@/lib/api'
 import { useTaskNotifications } from '@/hooks/useTaskNotifications'
-import { GripVertical, Plus } from 'lucide-react'
+import { GripVertical, Plus, X } from 'lucide-react'
 import {
   DndContext,
   closestCenter,
@@ -142,6 +142,13 @@ function SortableWidget({ widget, onHide }: { widget: DashboardWidget; onHide: (
             <GripVertical size={14} className="text-muted-foreground" />
           </div>
         </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onHide() }}
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/20 rounded"
+          title="Hide widget"
+        >
+          <X size={12} className="text-muted-foreground hover:text-red-400" />
+        </button>
       </div>
       {WidgetComponent && <WidgetComponent />}
     </div>
