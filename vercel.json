@@ -4,5 +4,9 @@
       "path": "/api/canvas/auto-sync",
       "schedule": "0 6 * * *"
     }
-  ]
+  ],
+  "security": {
+    "trustedIPs": [],
+    "passwordProtection": false
+  }
 }
