@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
+import JARVISLoader from '@/components/JarvisLoader'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
 import TodoWidget from '@/components/widgets/Todo'
@@ -311,6 +312,8 @@ export default function Home() {
 
   const hiddenWidgets = layout.filter(w => !w.visible)
 
+  const [jarvisDone, setJarvisDone] = useState(false)
+
   if (loading) {
     return (
       <div className="flex h-screen overflow-hidden">
@@ -319,6 +322,21 @@ export default function Home() {
           <div className="text-muted-foreground">Loading...</div>
         </main>
       </div>
+    )
+  }
+
+  // Show JARVIS loader on first visit
+  if (!jarvisDone) {
+    return (
+      <JARVISLoader
+        userName="Sir"
+        canvasDomain={process.env.NEXT_PUBLIC_CANVAS_DOMAIN}
+        canvasToken={process.env.NEXT_PUBLIC_CANVAS_TOKEN}
+        courseIds={['12345', '67890']} // Replace with actual course IDs
+        onComplete={() => setJarvisDone(true)}
+        autoExit={true}
+        exitDelay={3000}
+      />
     )
   }
 
