@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
 export function getSupabase() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://cihmiaytrnvvvbxwoxrb.supabase.co'
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || ''
+  
+  console.log('[getSupabase] URL:', supabaseUrl ? 'set' : 'missing', 'KEY:', supabaseAnonKey ? 'set' : 'missing')
   
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error('getSupabase: Missing URL or anon key')

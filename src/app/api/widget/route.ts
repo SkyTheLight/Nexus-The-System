@@ -23,9 +23,12 @@ function getTableName(type: string): string {
 }
 
 function getClient() {
+  console.log('[API/widget] NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'set' : 'MISSING')
+  console.log('[API/widget] NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'set' : 'MISSING')
+  
   const client = getSupabase()
   if (!client) {
-    throw new Error('Supabase client not initialized - missing env vars')
+    throw new Error(`Supabase client not initialized - URL: ${process.env.NEXT_PUBLIC_SUPABASE_URL ? 'exists' : 'missing'}, ANON_KEY: ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'exists' : 'missing'}`)
   }
   return client
 }
