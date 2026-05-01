@@ -1,0 +1,8 @@
+/* Weather Widget - matches dark HUD aesthetic */
+.widget-weather {
+  background: #0B0B0C;
+  border: 1px solid #00d4ff22;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}

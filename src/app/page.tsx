@@ -19,6 +19,7 @@ import AssignmentWidget from '@/components/widgets/Assignment'
 import AIWebsitesWidget from '@/components/widgets/AIWebsites'
 import SchoolLinksWidget from '@/components/widgets/SchoolLinks'
 import QuickLinksWidget from '@/components/widgets/QuickLinks'
+import SiteButtonsWidget from '@/components/widgets/SiteButtons'
 import SpotifyNowPlayingWidget from '@/components/widgets/SpotifyNowPlaying'
 import AIChatWidget from '@/components/widgets/AIChat'
 import CalendarWidget from '@/components/widgets/Calendar'
@@ -69,6 +70,7 @@ const widgetComponents: Record<string, any> = {
   'ai-websites': AIWebsitesWidget,
   'school-links': SchoolLinksWidget,
   'quick-links': QuickLinksWidget,
+  'site-buttons': SiteButtonsWidget,
   'spotify-now': SpotifyNowPlayingWidget,
   'ai-chat': AIChatWidget,
   'calendar': CalendarWidget,
@@ -96,7 +98,8 @@ const defaultLayout: DashboardWidget[] = [
   { widget_id: 'ai-websites', x: 0, y: 8, w: 2, h: 2, visible: true },
   { widget_id: 'school-links', x: 2, y: 8, w: 2, h: 2, visible: true },
   { widget_id: 'quick-links', x: 4, y: 8, w: 2, h: 2, visible: true },
-  { widget_id: 'spotify-now', x: 6, y: 8, w: 2, h: 2, visible: true },
+  { widget_id: 'site-buttons', x: 6, y: 8, w: 2, h: 2, visible: true },
+  { widget_id: 'spotify-now', x: 8, y: 8, w: 2, h: 2, visible: true },
   { widget_id: 'ai-chat', x: 8, y: 8, w: 2, h: 2, visible: true },
   { widget_id: 'calendar', x: 6, y: 10, w: 2, h: 2, visible: true },
   { widget_id: 'level', x: 8, y: 10, w: 2, h: 2, visible: true },
