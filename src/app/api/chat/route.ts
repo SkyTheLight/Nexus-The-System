@@ -142,6 +142,12 @@ export async function POST(request: NextRequest) {
 
     console.log('Calling Groq API with tools...')
 
+    // Filter messages to only send role and content (Groq doesn't accept timestamp)
+    const filteredMessages = messages.map((msg: any) => ({ 
+      role: msg.role, 
+      content: msg.content 
+    }))
+
     // First call - let ARISE decide what tools to use
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -166,7 +172,7 @@ CRITICAL INSTRUCTIONS:
 - When parsing "tomorrow", add 1 day to current date
 - Deadline format: YYYY-MM-DDTHH:MM:SS (24-hour)`
             },
-            ...messages,
+            ...filteredMessages,
           ],
           tools: tools,
           tool_choice: 'auto',
@@ -317,7 +323,7 @@ CRITICAL INSTRUCTIONS:
               role: 'system',
               content: `You are ARISE (Adaptive Response & Intelligent Shadow Engine). You are an advanced AI assistant with full control over the user's widgets and todos. Current date is ${new Date().toISOString().split('T')[0]}.`
             },
-            ...messages,
+            ...filteredMessages,
             assistantMessage,
             ...toolResults,
           ],

@@ -4,27 +4,37 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
-import TodoWidget from '@/components/widgets/TodoWidget'
-import GoalsWidget from '@/components/widgets/GoalsWidget'
-import IdeasWidget from '@/components/widgets/IdeasWidget'
-import NotesWidget from '@/components/widgets/NotesWidget'
-import MusicWidget from '@/components/widgets/MusicWidget'
-import CertificatesWidget from '@/components/widgets/CertificatesWidget'
-import DevWidget from '@/components/widgets/DevWidget'
-import PerformanceWidget from '@/components/widgets/PerformanceWidget'
-import TimelineWidget from '@/components/widgets/TimelineWidget'
-import GitHubWidget from '@/components/widgets/GitHubWidget'
-import AssignmentWidget from '@/components/widgets/AssignmentWidget'
-import AIWebsitesWidget from '@/components/widgets/AIWebsitesWidget'
-import SchoolLinksWidget from '@/components/widgets/SchoolLinksWidget'
-import QuickLinksWidget from '@/components/widgets/QuickLinksWidget'
-import SpotifyNowPlayingWidget from '@/components/widgets/SpotifyNowPlayingWidget'
-import AIChatWidget from '@/components/widgets/AIChatWidget'
+import TodoWidget from '@/components/widgets/Todo'
+import GoalsWidget from '@/components/widgets/Goals'
+import IdeasWidget from '@/components/widgets/Ideas'
+import NotesWidget from '@/components/widgets/Notes'
+import MusicWidget from '@/components/widgets/Music'
+import CertificatesWidget from '@/components/widgets/Certificates'
+import DevWidget from '@/components/widgets/Dev'
+import PerformanceWidget from '@/components/widgets/Performance'
+import TimelineWidget from '@/components/widgets/Timeline'
+import GitHubWidget from '@/components/widgets/GitHub'
+import AssignmentWidget from '@/components/widgets/Assignment'
+import AIWebsitesWidget from '@/components/widgets/AIWebsites'
+import SchoolLinksWidget from '@/components/widgets/SchoolLinks'
+import QuickLinksWidget from '@/components/widgets/QuickLinks'
+import SpotifyNowPlayingWidget from '@/components/widgets/SpotifyNowPlaying'
+import AIChatWidget from '@/components/widgets/AIChat'
+import CalendarWidget from '@/components/widgets/Calendar'
+import LevelWidget from '@/components/widgets/Level'
+import DateHighlightWidget from '@/components/widgets/DateHighlight'
+import WeatherWidget from '@/components/widgets/Weather'
+// import GitHubContributions from '@/components/widgets/GitHubContributions'
+import ClassScheduleWidget from '@/components/widgets/ClassSchedule'
+// import CanvasAnnouncements from '@/components/widgets/CanvasAnnouncements'
+// import ScreenTimeWidget from '@/components/widgets/ScreenTime'
+import StatsCards from '@/components/StatsCards'
 import ClockWidget from '@/components/ClockWidget'
 import PomodoroTimer from '@/components/PomodoroTimer'
 import QuoteCarousel from '@/components/QuoteCarousel'
 import LiquidBackground from '@/components/LiquidBackground'
 import { getDashboardLayout, saveDashboardLayout, type DashboardWidget } from '@/lib/api'
+import { useTaskNotifications } from '@/hooks/useTaskNotifications'
 import { GripVertical, Plus } from 'lucide-react'
 import {
   DndContext,
@@ -60,6 +70,14 @@ const widgetComponents: Record<string, any> = {
   'quick-links': QuickLinksWidget,
   'spotify-now': SpotifyNowPlayingWidget,
   'ai-chat': AIChatWidget,
+  'calendar': CalendarWidget,
+  'level': LevelWidget,
+  'date-highlight': DateHighlightWidget,
+  'weather': WeatherWidget,
+  // 'github-contributions': GitHubContributions,
+  'class-schedule': ClassScheduleWidget,
+  // 'canvas-announcements': CanvasAnnouncements,
+  // 'screen-time': ScreenTimeWidget,
 }
 
 const defaultLayout: DashboardWidget[] = [
@@ -77,8 +95,16 @@ const defaultLayout: DashboardWidget[] = [
   { widget_id: 'ai-websites', x: 0, y: 8, w: 2, h: 2, visible: true },
   { widget_id: 'school-links', x: 2, y: 8, w: 2, h: 2, visible: true },
   { widget_id: 'quick-links', x: 4, y: 8, w: 2, h: 2, visible: true },
-  { widget_id: 'spotify-now', x: 0, y: 10, w: 2, h: 1, visible: true },
-  { widget_id: 'ai-chat', x: 2, y: 10, w: 2, h: 3, visible: true },
+  { widget_id: 'spotify-now', x: 6, y: 8, w: 2, h: 2, visible: true },
+  { widget_id: 'ai-chat', x: 8, y: 8, w: 2, h: 2, visible: true },
+  { widget_id: 'calendar', x: 6, y: 10, w: 2, h: 2, visible: true },
+  { widget_id: 'level', x: 8, y: 10, w: 2, h: 2, visible: true },
+  { widget_id: 'date-highlight', x: 10, y: 10, w: 2, h: 2, visible: true },
+  { widget_id: 'weather', x: 12, y: 10, w: 2, h: 2, visible: true },
+  // 'github-contributions': GitHubContributions,
+  { widget_id: 'class-schedule', x: 6, y: 12, w: 2, h: 2, visible: true },
+  // 'canvas-announcements': CanvasAnnouncements,
+  // 'screen-time': ScreenTimeWidget,
 ]
 
 function SortableWidget({ widget, onHide }: { widget: DashboardWidget; onHide: () => void }) {
@@ -242,6 +268,8 @@ export default function Home() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Focus Board</h1>
             <p className="text-gray-300 mt-1">Your personal command center</p>
           </div>
+
+          <StatsCards />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <ClockWidget />

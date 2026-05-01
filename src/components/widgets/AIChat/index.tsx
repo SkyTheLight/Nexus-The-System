@@ -43,10 +43,13 @@ export default function AIChatWidget() {
     setLoading(true)
 
     try {
+      // Only send role and content to API (Groq doesn't accept timestamp)
+      const messagesToSend = [...messages, userMessage].map(({ role, content }) => ({ role, content }))
+      
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMessage] })
+        body: JSON.stringify({ messages: messagesToSend })
       })
 
       const data = await res.json()

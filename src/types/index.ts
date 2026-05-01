@@ -4,6 +4,7 @@ export interface Task {
   description?: string
   priority: 'low' | 'medium' | 'high'
   due_date?: string
+  deadline?: string
   tags?: string[]
   status: 'todo' | 'in-progress' | 'done'
   created_at: string
