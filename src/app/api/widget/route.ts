@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
 
@@ -23,9 +23,9 @@ function getTableName(type: string): string {
 }
 
 function getClient() {
-  const client = getSupabaseAdmin()
+  const client = getSupabase()
   if (!client) {
-    throw new Error('Supabase admin client not initialized - missing env vars')
+    throw new Error('Supabase client not initialized - missing env vars')
   }
   return client
 }
@@ -80,8 +80,11 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ data, message: 'Item created successfully' })
   } catch (error: any) {
-    console.error('API POST error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('getTasks: API error:', error)
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    )
   }
 }
 
