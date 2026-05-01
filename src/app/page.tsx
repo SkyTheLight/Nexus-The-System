@@ -27,7 +27,7 @@ import WeatherWidget from '@/components/widgets/Weather'
 // import GitHubContributions from '@/components/widgets/GitHubContributions'
 import ClassScheduleWidget from '@/components/widgets/ClassSchedule'
 import CanvasAnnouncements from '@/components/widgets/CanvasAnnouncements'
-// import ScreenTimeWidget from '@/components/widgets/ScreenTime'
+import ScreenTimeWidget from '@/components/widgets/ScreenTime'
 import StatsCards from '@/components/StatsCards'
 import ClockWidget from '@/components/ClockWidget'
 import PomodoroTimer from '@/components/PomodoroTimer'
@@ -77,7 +77,7 @@ const widgetComponents: Record<string, any> = {
   // 'github-contributions': GitHubContributions,
   'class-schedule': ClassScheduleWidget,
   'canvas-announcements': CanvasAnnouncements,
-  // 'screen-time': ScreenTimeWidget,
+  'screen-time': ScreenTimeWidget,
 }
 
 const defaultLayout: DashboardWidget[] = [
@@ -104,10 +104,10 @@ const defaultLayout: DashboardWidget[] = [
   // 'github-contributions': GitHubContributions,
   { widget_id: 'class-schedule', x: 6, y: 12, w: 2, h: 2, visible: true },
   { widget_id: 'canvas-announcements', x: 8, y: 12, w: 2, h: 2, visible: true },
-  // 'screen-time': ScreenTimeWidget,
+  { widget_id: 'screen-time', x: 10, y: 12, w: 2, h: 2, visible: true },
 ]
 
-function SortableWidget({ widget, onHide }: { widget: DashboardWidget; onHide: () => void }) {
+function SortableWidget({ widget, onHide, onResize }: { widget: DashboardWidget; onHide: () => void; onResize: (w: number, h: number) => void }) {
   const {
     attributes,
     listeners,
@@ -120,11 +120,47 @@ function SortableWidget({ widget, onHide }: { widget: DashboardWidget; onHide: (
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    gridColumn: `span ${widget.w}`,
     gridRow: `span ${widget.h}`,
     opacity: isDragging ? 0.5 : 1,
+    position: 'relative' as const,
   }
 
   const WidgetComponent = widgetComponents[widget.widget_id]
+
+  const startResize = (direction: 'right' | 'bottom' | 'corner', e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    
+    const startX = e.clientX
+    const startY = e.clientY
+    const startW = widget.w
+    const startH = widget.h
+
+    const onMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - startX
+      const deltaY = e.clientY - startY
+      const cellSize = 50 // approximate cell size in pixels
+
+      if (direction === 'right' || direction === 'corner') {
+        const newW = Math.max(1, startW + Math.round(deltaX / cellSize))
+        widget.w = newW
+      }
+      if (direction === 'bottom' || direction === 'corner') {
+        const newH = Math.max(1, startH + Math.round(deltaY / cellSize))
+        widget.h = newH
+      }
+      onResize(widget.w, widget.h)
+    }
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+    }
+
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+  }
 
   return (
     <div
@@ -151,6 +187,20 @@ function SortableWidget({ widget, onHide }: { widget: DashboardWidget; onHide: (
         </button>
       </div>
       {WidgetComponent && <WidgetComponent />}
+      
+      {/* Resize handles */}
+      <div
+        className="absolute right-0 top-0 w-2 h-full cursor-e-resize hover:bg-blue-500/20"
+        onMouseDown={(e) => startResize('right', e)}
+      />
+      <div
+        className="absolute bottom-0 left-0 w-full h-2 cursor-s-resize hover:bg-blue-500/20"
+        onMouseDown={(e) => startResize('bottom', e)}
+      />
+      <div
+        className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize hover:bg-blue-500/20"
+        onMouseDown={(e) => startResize('corner', e)}
+      />
     </div>
   )
 }
@@ -221,6 +271,16 @@ export default function Home() {
       localStorage.setItem('widget-layout', JSON.stringify(newLayout))
       console.log('Layout saved to localStorage:', newLayout.map(w => ({ id: w.widget_id, visible: w.visible })))
       
+      return newLayout
+    })
+  }, [])
+
+  const updateWidgetSize = useCallback((widgetId: string, newW: number, newH: number) => {
+    setLayout(prevLayout => {
+      const newLayout = prevLayout.map(w =>
+        w.widget_id === widgetId ? { ...w, w: Math.max(1, newW), h: Math.max(1, newH) } : w
+      )
+      localStorage.setItem('widget-layout', JSON.stringify(newLayout))
       return newLayout
     })
   }, [])
@@ -299,6 +359,7 @@ export default function Home() {
                     key={widget.widget_id}
                     widget={widget}
                     onHide={() => hideWidget(widget.widget_id)}
+                    onResize={(w, h) => updateWidgetSize(widget.widget_id, w, h)}
                   />
                 ))}
               </div>

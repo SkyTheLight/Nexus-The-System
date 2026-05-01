@@ -1,194 +1,152 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Monitor, Clock, Plus, Trash2, BarChart3 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 
 interface ScreenTimeEntry {
-  app: string
-  duration: number // in minutes
-  category: 'productive' | 'social' | 'entertainment' | 'other'
-}
-
-const CATEGORY_COLORS = {
-  productive: 'bg-green-500',
-  social: 'bg-blue-500',
-  entertainment: 'bg-purple-500',
-  other: 'bg-gray-500',
-}
-
-const CATEGORY_LABELS = {
-  productive: 'Productive',
-  social: 'Social',
-  entertainment: 'Entertainment',
-  other: 'Other',
+  id: string
+  name: string
+  category: 'app' | 'website'
+  minutes: number
+  date: string
 }
 
 export default function ScreenTimeWidget() {
-  const [screenTime, setScreenTime] = useState<ScreenTimeEntry[]>([])
-  const [totalTime, setTotalTime] = useState(0)
-  const [mounted, setMounted] = useState(false)
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [newApp, setNewApp] = useState('')
-  const [newDuration, setNewDuration] = useState('')
-  const [newCategory, setNewCategory] = useState<'productive' | 'social' | 'entertainment' | 'other'>('productive')
+  const [entries, setEntries] = useState<ScreenTimeEntry[]>([])
+  const [name, setName] = useState('')
+  const [category, setCategory] = useState<'app' | 'website'>('app')
+  const [minutes, setMinutes] = useState(0)
+  const [showForm, setShowForm] = useState(false)
+
+  const today = new Date().toISOString().split('T')[0]
 
   useEffect(() => {
-    setMounted(true)
-    
-    // Load today's screen time from localStorage
-    const today = new Date().toISOString().split('T')[0]
-    const saved = localStorage.getItem(`screentime-${today}`)
-    
-    if (saved) {
-      const data = JSON.parse(saved)
-      setScreenTime(data.entries || [])
-      setTotalTime(data.total || 0)
-    }
+    loadTodayData()
   }, [])
 
-  // Save to localStorage whenever data changes
-  useEffect(() => {
-    if (!mounted) return
-    const today = new Date().toISOString().split('T')[0]
-    localStorage.setItem(`screentime-${today}`, JSON.stringify({
-      entries: screenTime,
-      total: totalTime,
-    }))
-  }, [screenTime, totalTime, mounted])
+  function loadTodayData() {
+    try {
+      const saved = localStorage.getItem(`screentime-${today}`)
+      if (saved) {
+        setEntries(JSON.parse(saved))
+      }
+    } catch (e) {
+      console.error('Failed to load screen time:', e)
+    }
+  }
 
-  const addEntry = () => {
-    if (!newApp || !newDuration) return
-    
-    const duration = parseInt(newDuration)
-    if (isNaN(duration) || duration <= 0) return
+  function saveData(newEntries: ScreenTimeEntry[]) {
+    setEntries(newEntries)
+    localStorage.setItem(`screentime-${today}`, JSON.stringify(newEntries))
+  }
+
+  function addEntry() {
+    if (!name.trim() || minutes <= 0) return
 
     const newEntry: ScreenTimeEntry = {
-      app: newApp,
-      duration,
-      category: newCategory,
+      id: Date.now().toString(),
+      name: name.trim(),
+      category,
+      minutes,
+      date: today
     }
 
-    setScreenTime(prev => [...prev, newEntry])
-    setTotalTime(prev => prev + duration)
-    
-    // Reset form
-    setNewApp('')
-    setNewDuration('')
-    setShowAddForm(false)
+    const newEntries = [...entries, newEntry]
+    saveData(newEntries)
+    setName('')
+    setMinutes(0)
+    setShowForm(false)
   }
 
-  const removeEntry = (index: number) => {
-    const entry = screenTime[index]
-    setScreenTime(prev => prev.filter((_, i) => i !== index))
-    setTotalTime(prev => prev - entry.duration)
+  function removeEntry(id: string) {
+    const newEntries = entries.filter(e => e.id !== id)
+    saveData(newEntries)
   }
 
-  const formatTime = (minutes: number) => {
-    const hrs = Math.floor(minutes / 60)
-    const mins = minutes % 60
-    return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`
-  }
-
-  const maxDuration = Math.max(...screenTime.map(e => e.duration), 1)
-
-  if (!mounted) return <div className="text-muted-foreground text-sm p-4">Loading...</div>
+  const totalMinutes = entries.reduce((sum, e) => sum + e.minutes, 0)
+  const totalHours = Math.floor(totalMinutes / 60)
+  const remainingMinutes = totalMinutes % 60
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Monitor size={16} className="text-blue-400" />
-          <h3 className="font-semibold text-sm">Screen Time</h3>
-        </div>
+        <h3 className="font-semibold text-sm">Screen Time</h3>
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="p-1 hover:bg-gray-700 rounded"
-          title="Add app"
+          onClick={() => setShowForm(!showForm)}
+          className="p-1 hover:bg-accent rounded"
         >
-          <Plus size={12} />
+          <Plus size={14} />
         </button>
       </div>
 
-      <div className="mb-3 text-center">
-        <div className="text-2xl font-bold text-white">{formatTime(totalTime)}</div>
-        <div className="text-xs text-gray-400">Today's total (manual)</div>
+      {/* Today's total */}
+      <div className="text-center mb-4">
+        <div className="text-2xl font-bold">
+          {totalHours}h {remainingMinutes}m
+        </div>
+        <div className="text-xs text-muted-foreground">Today</div>
       </div>
 
-      {showAddForm && (
-        <div className="mb-3 p-2 bg-gray-800/50 rounded-lg space-y-2">
+      {/* Add entry form */}
+      {showForm && (
+        <div className="mb-4 p-3 bg-accent/50 rounded-lg space-y-2">
           <input
             type="text"
-            placeholder="App name"
-            value={newApp}
-            onChange={(e) => setNewApp(e.target.value)}
-            className="w-full px-2 py-1 text-xs bg-gray-700 rounded border border-gray-600 focus:border-blue-500 outline-none"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="App/Website name"
+            className="w-full px-2 py-1 text-xs bg-background border border-border rounded"
           />
           <div className="flex gap-2">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as 'app' | 'website')}
+              className="flex-1 px-2 py-1 text-xs bg-background border border-border rounded"
+            >
+              <option value="app">App</option>
+              <option value="website">Website</option>
+            </select>
             <input
               type="number"
+              value={minutes}
+              onChange={(e) => setMinutes(parseInt(e.target.value) || 0)}
               placeholder="Minutes"
-              value={newDuration}
-              onChange={(e) => setNewDuration(e.target.value)}
-              className="flex-1 px-2 py-1 text-xs bg-gray-700 rounded border border-gray-600 focus:border-blue-500 outline-none"
-              min="1"
+              className="w-20 px-2 py-1 text-xs bg-background border border-border rounded"
             />
-            <select
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value as any)}
-              className="px-2 py-1 text-xs bg-gray-700 rounded border border-gray-600 focus:border-blue-500 outline-none"
-            >
-              <option value="productive">Productive</option>
-              <option value="social">Social</option>
-              <option value="entertainment">Entertainment</option>
-              <option value="other">Other</option>
-            </select>
           </div>
           <button
             onClick={addEntry}
-            className="w-full py-1 text-xs bg-blue-600 hover:bg-blue-700 rounded transition-colors"
+            className="w-full py-1 bg-primary text-primary-foreground text-xs rounded hover:opacity-90"
           >
             Add
           </button>
         </div>
       )}
 
-      <div className="flex-1 space-y-2 overflow-y-auto">
-        {screenTime.length === 0 ? (
-          <p className="text-xs text-gray-500 text-center py-4">No apps tracked yet. Click + to add.</p>
-        ) : (
-          screenTime.map((entry, idx) => (
-            <div key={idx} className="space-y-1 group">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-300 truncate flex-1">{entry.app}</span>
-                <span className="text-gray-400 mx-2">{formatTime(entry.duration)}</span>
-                <button
-                  onClick={() => removeEntry(idx)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Trash2 size={10} className="text-red-400" />
-                </button>
-              </div>
-              <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${CATEGORY_COLORS[entry.category]} transition-all duration-500`}
-                  style={{ width: `${(entry.duration / maxDuration) * 100}%` }}
-                />
-              </div>
-            </div>
-          ))
+      {/* Entries list */}
+      <div className="flex-1 overflow-y-auto space-y-1">
+        {entries.map(entry => (
+          <div
+            key={entry.id}
+            className="flex items-center gap-2 p-2 hover:bg-accent rounded group"
+          >
+            <span className="text-xs">{entry.category === 'app' ? '📱' : '🌐'}</span>
+            <span className="flex-1 text-xs truncate">{entry.name}</span>
+            <span className="text-xs text-muted-foreground">{entry.minutes}m</span>
+            <button
+              onClick={() => removeEntry(entry.id)}
+              className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-red-500/20 rounded"
+            >
+              <Trash2 size={10} className="text-red-400" />
+            </button>
+          </div>
+        ))}
+        {entries.length === 0 && !showForm && (
+          <div className="text-xs text-muted-foreground text-center py-4">
+            No entries today
+          </div>
         )}
       </div>
-
-      {screenTime.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-800 flex items-center gap-4 text-xs text-gray-400">
-          {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
-            <div key={key} className="flex items-center gap-1">
-              <div className={`w-2 h-2 rounded ${CATEGORY_COLORS[key as keyof typeof CATEGORY_COLORS]}`} />
-              <span>{label}</span>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
