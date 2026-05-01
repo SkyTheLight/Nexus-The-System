@@ -26,7 +26,7 @@ import DateHighlightWidget from '@/components/widgets/DateHighlight'
 import WeatherWidget from '@/components/widgets/Weather'
 // import GitHubContributions from '@/components/widgets/GitHubContributions'
 import ClassScheduleWidget from '@/components/widgets/ClassSchedule'
-// import CanvasAnnouncements from '@/components/widgets/CanvasAnnouncements'
+import CanvasAnnouncements from '@/components/widgets/CanvasAnnouncements'
 // import ScreenTimeWidget from '@/components/widgets/ScreenTime'
 import StatsCards from '@/components/StatsCards'
 import ClockWidget from '@/components/ClockWidget'
@@ -76,7 +76,7 @@ const widgetComponents: Record<string, any> = {
   'weather': WeatherWidget,
   // 'github-contributions': GitHubContributions,
   'class-schedule': ClassScheduleWidget,
-  // 'canvas-announcements': CanvasAnnouncements,
+  'canvas-announcements': CanvasAnnouncements,
   // 'screen-time': ScreenTimeWidget,
 }
 
@@ -103,7 +103,7 @@ const defaultLayout: DashboardWidget[] = [
   { widget_id: 'weather', x: 12, y: 10, w: 2, h: 2, visible: true },
   // 'github-contributions': GitHubContributions,
   { widget_id: 'class-schedule', x: 6, y: 12, w: 2, h: 2, visible: true },
-  // 'canvas-announcements': CanvasAnnouncements,
+  { widget_id: 'canvas-announcements', x: 8, y: 12, w: 2, h: 2, visible: true },
   // 'screen-time': ScreenTimeWidget,
 ]
 
