@@ -28,6 +28,9 @@ export default function JARVISLoader({
 }: JARVISLoaderProps) {
   const [stage, setStage] = useState<'initializing' | 'displaying' | 'exiting' | 'done'>('initializing')
   const [time, setTime] = useState(new Date())
+  const [error, setError] = useState<string | null>(null)
+
+  console.log('[JARVIS] Rendering, stage:', stage, 'canvasDomain:', canvasDomain ? 'set' : 'missing')
 
   const greeting = getGreeting()
   const { weather, weatherLoading, weatherError } = useWeather()
@@ -37,6 +40,20 @@ export default function JARVISLoader({
     canvasToken,
     courseIds
   )
+
+  if (error) {
+    return (
+      <div className="jarvis-container">
+        <div className="initializing" style={{ color: 'red' }}>
+          SYSTEM ERROR: {error}
+          <br />
+          <button onClick={() => { setError(null); setStage('initializing') }} style={{ marginTop: 20, padding: '8px 16px', background: '#00d4ff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>
+            RETRY
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   // Live clock
   useEffect(() => {

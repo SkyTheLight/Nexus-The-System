@@ -314,6 +314,10 @@ export default function Home() {
 
   const [jarvisDone, setJarvisDone] = useState(false)
 
+  console.log('[PAGE] loading:', loading, 'jarvisDone:', jarvisDone)
+  console.log('[PAGE] CANVAS_DOMAIN:', process.env.NEXT_PUBLIC_CANVAS_DOMAIN ? 'set' : 'missing')
+  console.log('[PAGE] CANVAS_TOKEN:', process.env.NEXT_PUBLIC_CANVAS_TOKEN ? 'set' : 'missing')
+
   if (loading) {
     return (
       <div className="flex h-screen overflow-hidden">
@@ -327,13 +331,17 @@ export default function Home() {
 
   // Show JARVIS loader on first visit
   if (!jarvisDone) {
+    console.log('[PAGE] Rendering JARVIS Loader...')
     return (
       <JARVISLoader
         userName="Sir"
         canvasDomain={process.env.NEXT_PUBLIC_CANVAS_DOMAIN}
         canvasToken={process.env.NEXT_PUBLIC_CANVAS_TOKEN}
         courseIds={['12345', '67890']} // Replace with actual course IDs
-        onComplete={() => setJarvisDone(true)}
+        onComplete={() => {
+          console.log('[PAGE] JARVIS onComplete called')
+          setJarvisDone(true)
+        }}
         autoExit={true}
         exitDelay={3000}
       />
