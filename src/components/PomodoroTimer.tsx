@@ -67,8 +67,11 @@ export default function PomodoroTimer() {
 
       <div className="relative h-2 bg-[var(--color-border)] rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-1000 ${isWork ? 'bg-[var(--color-accent)]' : 'bg-[#22c55e]'}`}
-          style={{ width: `${progress}%` }}
+          className="h-full rounded-full transition-all duration-1000"
+          style={{ 
+            width: `${progress}%`,
+            background: isWork ? 'var(--color-accent)' : '#22c55e'
+          }}
         />
       </div>
 

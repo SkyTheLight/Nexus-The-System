@@ -23,11 +23,17 @@ export default function ScreenTimeWidget() {
 
   const [sessionSeconds, setSessionSeconds] = useState(0)
 
+  // Count up every second while tab is visible
   useEffect(() => {
     const timer = setInterval(() => {
-      setSessionSeconds(Math.floor(sessionActiveMs / 1000))
+      setSessionSeconds(prev => prev + 1)
     }, 1000)
     return () => clearInterval(timer)
+  }, [])
+
+  // Reset counter when sessionActiveMs changes (visibility change)
+  useEffect(() => {
+    setSessionSeconds(Math.floor(sessionActiveMs / 1000))
   }, [sessionActiveMs])
 
   const formatSession = (secs: number) => {

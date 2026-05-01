@@ -170,11 +170,11 @@ export default function JARVISLoader({
                   <div className="empty-state">{weatherError}</div>
                 ) : weather ? (
                 <div className="weather-info">
-                  <div className="weather-temp">{weather.temp_c}°C</div>
+                  <div className="weather-temp">{weather.temperature}°C</div>
                   <div className="weather-details">
-                    <div className="weather-detail">{weather.condition}</div>
+                    <div className="weather-detail">{weather.weatherInfo?.label || weather.condition}</div>
                     <div className="weather-detail">Humidity: {weather.humidity}%</div>
-                    <div className="weather-detail">Feels like: {weather.feels_like_c}°C</div>
+                    <div className="weather-detail">Feels like: {weather.feelsLike}°C</div>
                   </div>
                 </div>
               ) : (

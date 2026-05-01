@@ -338,9 +338,9 @@ export default function Home() {
     return (
       <JARVISLoader
         userName="Sir"
-        canvasDomain={process.env.NEXT_PUBLIC_CANVAS_DOMAIN}
-        canvasToken={process.env.NEXT_PUBLIC_CANVAS_TOKEN}
-        courseIds={['12345', '67890']} // Replace with actual course IDs
+        canvasDomain={process.env.NEXT_PUBLIC_CANVAS_DOMAIN || ''}
+        canvasToken={process.env.NEXT_PUBLIC_CANVAS_TOKEN || ''}
+        courseIds={[]} // Auto-fetch from enrollments
         onComplete={() => {
           console.log('[PAGE] JARVIS onComplete called')
           setJarvisDone(true)
@@ -361,8 +361,8 @@ export default function Home() {
         <TopBar />
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Focus Board</h1>
-            <p className="text-gray-300 mt-1">Your personal command center</p>
+            <h1 className="text-2xl font-bold text-white">Focus Board</h1>
+            <p className="text-[13px] text-[var(--color-text-muted)] mt-1">Your personal command center</p>
           </div>
 
           <StatsCards />

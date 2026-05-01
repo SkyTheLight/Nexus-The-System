@@ -77,10 +77,11 @@ export default function Sidebar() {
         </div>
 
         <nav className="flex-1 py-4 overflow-y-auto">
-          {navigation.map(section => (
+          {navigation.map((section, index) => (
             <div key={section.section}>
+              {index > 0 && <div className="sidebar-separator" />}
               {sidebarOpen && (
-                <div className="sidebar-section-label">{section.section}</div>
+                <div className="sidebar-section-label mt-2">{section.section}</div>
               )}
               {section.items.map((item) => (
                 <Link
@@ -94,7 +95,6 @@ export default function Sidebar() {
                   {sidebarOpen && <span>{item.label}</span>}
                 </Link>
               ))}
-              <div className="sidebar-separator" />
             </div>
           ))}
         </nav>

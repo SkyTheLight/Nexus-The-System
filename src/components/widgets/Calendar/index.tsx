@@ -63,7 +63,7 @@ export default function CalendarWidget() {
       {/* Day headers */}
       <div className="grid grid-cols-7 gap-0 mb-1">
         {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(d => (
-          <div key={d} className="text-[8px] text-[#00d4ff44] text-center py-1">{d}</div>
+          <div key={d} className="text-[8px] text-[var(--color-accent-dim)] text-center py-1">{d}</div>
         ))}
       </div>
 
