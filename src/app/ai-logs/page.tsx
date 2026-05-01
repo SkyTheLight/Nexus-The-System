@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { getSB } from '@/lib/api'
 import { Trash2 } from 'lucide-react'
 import BackButton from '@/components/BackButton'
 
@@ -15,34 +13,35 @@ interface AILog {
 }
 
 export default function AILogsPage() {
+  const [logs, setLogs] = useState<AILog[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<number | null>(null)
-  const supabase = getSB()
 
-  const { data: logs, isLoading, refetch } = useQuery({
-    queryKey: ['ai-logs'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ai_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      return data as AILog[]
+  async function loadLogs() {
+    try {
+      const res = await fetch('/api/ai-logs')
+      if (!res.ok) throw new Error('Failed to load')
+      const data = await res.json()
+      setLogs(data || [])
+    } catch (e) {
+      console.error('Failed to load AI logs:', e)
+    } finally {
+      setIsLoading(false)
     }
-  })
+  }
+
+  useEffect(() => {
+    loadLogs()
+  }, [])
 
   const deleteLog = async (id: number) => {
     if (!confirm('Delete this AI conversation?')) return
     
     setDeletingId(id)
     try {
-      const { error } = await supabase
-        .from('ai_logs')
-        .delete()
-        .eq('id', id)
-      
-      if (error) throw error
-      refetch()
+      const res = await fetch(`/api/ai-logs?id=${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Delete failed')
+      loadLogs()
     } catch (error) {
       console.error('Delete error:', error)
     } finally {
@@ -54,13 +53,9 @@ export default function AILogsPage() {
     if (!confirm('Delete ALL AI conversation logs? This cannot be undone.')) return
     
     try {
-      const { error } = await supabase
-        .from('ai_logs')
-        .delete()
-        .neq('id', 0)
-      
-      if (error) throw error
-      refetch()
+      const res = await fetch('/api/ai-logs?all=true', { method: 'DELETE' })
+      if (!res.ok) throw new Error('Clear all failed')
+      loadLogs()
     } catch (error) {
       console.error('Clear all error:', error)
     }
