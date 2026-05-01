@@ -20,9 +20,9 @@ export default function ClockWidget() {
   const displayHours = (time.getHours() % 12 || 12).toString().padStart(2, '0')
 
   return (
-    <div className="p-6 bg-[#0B0B0C] border border-white/10 rounded-2xl">
+    <div className="p-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)]">
       <div className="flex items-center gap-3 mb-4">
-        <ClockIcon size={24} className="text-primary" />
+        <ClockIcon size={24} className="text-[var(--color-accent)]" />
         {isEditing ? (
           <input
             type="text"
@@ -30,27 +30,25 @@ export default function ClockWidget() {
             onChange={(e) => setClockName(e.target.value)}
             onBlur={() => setIsEditing(false)}
             onKeyDown={(e) => e.key === 'Enter' && setIsEditing(false)}
-            className="bg-transparent text-xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent focus:outline-none"
+            className="bg-transparent text-xl font-bold text-white outline-none"
             autoFocus
           />
         ) : (
           <h2
             onClick={() => setIsEditing(true)}
-            className="text-xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent cursor-pointer hover:opacity-80"
+            className="text-xl font-bold text-white cursor-pointer hover:opacity-80"
           >
             {clockName}
           </h2>
         )}
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-center">
         <div>
-          <div className="text-5xl font-bold font-mono">
-            {displayHours}:{minutes}:{seconds}
-            <span className="text-2xl font-normal text-muted-foreground ml-3">{period}</span>
-          </div>
-          <div className="text-sm text-muted-foreground mt-2">
+          <div className="clock-time">{displayHours}:{minutes}:{seconds}<span className="clock-ampm">{period}</span></div>
+          <div className="text-sm text-[var(--color-text-muted)] mt-2">
             {time.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </div>
+          <div className="clock-underline" />
         </div>
       </div>
     </div>

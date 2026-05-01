@@ -1,77 +1,125 @@
 'use client'
 
-import { useEffect } from 'react'
-import { Calendar as CalendarIcon, MapPin, Clock } from 'lucide-react'
-import { signIn } from 'next-auth/react'
+import { useState } from 'react'
+import { ChevronLeft, ChevronRight, MapPin, Clock, Plus } from 'lucide-react'
 import { useCalendar, formatDate, formatTime, truncate } from './useCalendar'
+import AddClassForm from './AddClassForm'
+import DayView from './DayView'
 
 export default function CalendarWidget() {
-  const { events, loading, authenticated, refetch } = useCalendar()
+  const {
+    currentDate,
+    holidays,
+    classes,
+    loading,
+    goToPrevMonth,
+    goToNextMonth,
+    getDaysInMonth,
+    getFirstDayOfMonth,
+    isToday,
+    getHolidayForDay,
+    getClassesForDay,
+    formatMonthYear,
+    refetch
+  } = useCalendar()
+
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [showAddForm, setShowAddForm] = useState(false)
 
   if (loading) return <div className="text-muted-foreground text-sm p-4">LOADING...</div>
 
-  const today = formatDate(new Date())
+  const daysInMonth = getDaysInMonth(currentDate)
+  const firstDay = getFirstDayOfMonth(currentDate)
+  const monthYear = formatMonthYear(currentDate)
+
+  // Build calendar grid
+  const blanks = Array(firstDay).fill(null)
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1)
+
+  const handleDayClick = (day: number) => {
+    setSelectedDay(selectedDay === day ? null : day)
+  }
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">CALENDAR</h3>
-        <button onClick={refetch} className="p-1 hover:bg-white/5 rounded transition-colors">
-          <CalendarIcon size={14} />
+        <button onClick={() => setShowAddForm(!showAddForm)} className="p-1 hover:bg-white/5 rounded transition-colors">
+          <Plus size={14} />
         </button>
       </div>
 
-      <div className="text-xs text-[#00d4ff88] mb-3">{today}</div>
-
-      {!authenticated && (
-        <button
-          onClick={() => signIn('google')}
-          className="w-full py-2 mb-3 bg-[#00d4ff] text-black text-xs font-bold rounded hover:opacity-90 transition-opacity"
-        >
-          CONNECT GOOGLE CALENDAR
+      {/* Month navigation */}
+      <div className="flex items-center justify-between mb-3">
+        <button onClick={goToPrevMonth} className="p-1 hover:bg-white/5 rounded">
+          <ChevronLeft size={14} />
         </button>
+        <span className="text-xs text-[#00d4ffcc] font-mono">{monthYear}</span>
+        <button onClick={goToNextMonth} className="p-1 hover:bg-white/5 rounded">
+          <ChevronRight size={14} />
+        </button>
+      </div>
+
+      {/* Day headers */}
+      <div className="grid grid-cols-7 gap-0 mb-1">
+        {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(d => (
+          <div key={d} className="text-[8px] text-[#00d4ff44] text-center py-1">{d}</div>
+        ))}
+      </div>
+
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 gap-0 flex-1">
+        {blanks.map((_, i) => (
+          <div key={`b-${i}`} className="p-0.5" />
+        ))}
+        {days.map(day => {
+          const holiday = getHolidayForDay(day)
+          const dayClasses = getClassesForDay(day)
+          const today = isToday(day)
+          const isSelected = selectedDay === day
+
+          return (
+            <div
+              key={day}
+              onClick={() => handleDayClick(day)}
+              className={`p-0.5 cursor-pointer flex flex-col items-center justify-start relative ${
+                today ? 'border border-[#00d4ff] rounded' : ''
+              } ${isSelected ? 'bg-[#00d4ff11]' : ''}`}
+            >
+              <span className={`text-[10px] ${today ? 'text-[#00d4ff] font-bold' : 'text-[#ffffffaa]'}`}>
+                {day}
+              </span>
+              <div className="flex gap-0.5 mt-0.5">
+                {holiday && <div className="w-1 h-1 rounded-full bg-[#ff6b35]" title={holiday.localName} />}
+                {dayClasses.slice(0, 2).map((c, i) => (
+                  <div
+                    key={i}
+                    className="w-1 h-1 rounded-full"
+                    style={{ background: c.color || '#00d4ff' }}
+                    title={c.subject}
+                  />
+                ))}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Selected day view */}
+      {selectedDay !== null && (
+        <DayView
+          day={selectedDay}
+          date={currentDate}
+          holiday={getHolidayForDay(selectedDay)}
+          classes={getClassesForDay(selectedDay)}
+          onClose={() => setSelectedDay(null)}
+        />
       )}
 
-      <div className="flex-1 overflow-y-auto space-y-2">
-        {events.length === 0 ? (
-          <div className="text-xs text-muted-foreground text-center py-4">
-            No upcoming events.
-          </div>
-        ) : (
-          events.map((event, i) => {
-            const isFirst = i === 0
-            return (
-              <div
-                key={event.id}
-                className="p-2 bg-[#0B0B0C] border border-[#00d4ff22] rounded-lg"
-              >
-                <div className="flex items-start gap-2">
-                  {isFirst && (
-                    <div className="w-2 h-2 rounded-full bg-[#00d4ff] animate-pulse mt-1 flex-shrink-0" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium text-white truncate">
-                      {event.title}
-                    </div>
-                    <div className="flex items-center gap-1 mt-1 text-[10px] text-[#00d4ff88]">
-                      <Clock size={10} />
-                      {event.isAllDay
-                        ? 'ALL DAY'
-                        : `${formatTime(event.start, false)} - ${event.end ? formatTime(event.end, false) : ''}`}
-                    </div>
-                    {event.location && (
-                      <div className="flex items-center gap-1 mt-0.5 text-[10px] text-[#00d4ff88] truncate">
-                        <MapPin size={10} />
-                        {truncate(event.location, 30)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )
-          })
-        )}
-      </div>
+      {/* Add class form */}
+      {showAddForm && (
+        <AddClassForm onClose={() => setShowAddForm(false)} onSave={refetch} />
+      )}
     </div>
   )
 }

@@ -29,7 +29,7 @@ export function useWeather() {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 300000
+          maximumAge: 0
         })
       })
 
@@ -67,7 +67,8 @@ export function useWeather() {
       })
     } catch (e: any) {
       console.error('Weather fetch failed:', e)
-      setError('Location access denied.')
+      const msg = e instanceof GeolocationPositionError ? 'Location access denied.' : 'Weather unavailable.'
+      setError(msg)
     } finally {
       setLoading(false)
     }

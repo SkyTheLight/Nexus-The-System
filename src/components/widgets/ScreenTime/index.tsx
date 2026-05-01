@@ -49,13 +49,36 @@ export default function ScreenTimeWidget() {
 
   const maxBarMs = Math.max(...weekHistory.map(d => d.activeMs), 1)
 
+  const [debugMode, setDebugMode] = useState(false)
+
+  useEffect(() => {
+    // Show debug indicator in development
+    if (process.env.NODE_ENV === 'development') {
+      setDebugMode(true)
+    }
+  }, [])
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">SCREEN TIME</h3>
-        <button onClick={() => setShowForm(!showForm)} className="p-1 hover:bg-white/5 rounded transition-colors">
-          {showForm ? <Trash2 size={14} /> : <Plus size={14} />}
-        </button>
+        <div className="flex items-center gap-2">
+          {debugMode && (
+            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] ${
+              document?.visibilityState === 'visible'
+                ? 'bg-[#22c55e33] text-[#22c55e] animate-pulse'
+                : 'bg-[#ffffff22] text-[#ffffff44]'
+            }`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${
+                document?.visibilityState === 'visible' ? 'bg-[#22c55e]' : 'bg-[#ffffff44]'
+              }`} />
+              {document?.visibilityState === 'visible' ? 'TRACKING' : 'PAUSED'}
+            </div>
+          )}
+          <button onClick={() => setShowForm(!showForm)} className="p-1 hover:bg-white/5 rounded transition-colors">
+            {showForm ? <Trash2 size={14} /> : <Plus size={14} />}
+          </button>
+        </div>
       </div>
 
       {/* Today's total */}

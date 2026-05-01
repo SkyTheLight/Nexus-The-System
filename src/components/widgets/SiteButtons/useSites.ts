@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getSupabase } from '@/lib/supabase'
-import type { SiteConfig } from '@/lib/sites'
+import type { SiteConfig, SiteCategory } from '@/lib/sites'
 import { defaultSites } from '@/lib/sites'
 
 export interface SiteEntry extends SiteConfig {
-  user_site_id?: string // for user-added sites
+  user_site_id?: string
 }
 
 export function useSites() {
@@ -14,11 +14,9 @@ export function useSites() {
   const loadSites = useCallback(async () => {
     setLoading(true)
     try {
-      // Load user site order from localStorage
       const savedOrder = localStorage.getItem('site-buttons-order')
       let orderedIds: string[] = savedOrder ? JSON.parse(savedOrder) : []
 
-      // Merge: start with defaults, add user sites
       const supabase = getSupabase()
       let userSites: SiteEntry[] = []
 
@@ -26,26 +24,25 @@ export function useSites() {
         try {
           const { data, error } = await supabase
             .from('user_sites')
-            .select('id, name, url, created_at')
+            .select('id, name, url, category')
             .order('created_at', { ascending: true })
 
           if (!error && data) {
-            userSites = data.map(s => ({
+            userSites = data.map((s: any) => ({
               id: s.id,
               name: s.name,
               url: s.url,
+              category: s.category || 'all',
               user_site_id: s.id
             }))
           }
         } catch {
-          // supabase not available, continue with defaults
+          // supabase not available
         }
       }
 
-      // Combine default + user sites
       const allSites = [...defaultSites, ...userSites]
 
-      // Sort by saved order
       if (orderedIds.length > 0) {
         const siteMap = new Map(allSites.map(s => [s.id, s]))
         const ordered = orderedIds.map(id => siteMap.get(id)).filter(Boolean) as SiteEntry[]
@@ -71,7 +68,6 @@ export function useSites() {
     const ids = newSites.map(s => s.id)
     localStorage.setItem('site-buttons-order', JSON.stringify(ids))
 
-    // Save to Supabase if available
     const supabase = getSupabase()
     if (supabase) {
       supabase
@@ -85,13 +81,13 @@ export function useSites() {
     }
   }, [])
 
-  const addSite = useCallback(async (name: string, url: string) => {
+  const addSite = useCallback(async (name: string, url: string, category: string = 'all') => {
     const supabase = getSupabase()
     if (supabase) {
       try {
         const { data, error } = await supabase
           .from('user_sites')
-          .insert({ name, url })
+          .insert({ name, url, category })
           .select()
           .single()
 
@@ -100,26 +96,26 @@ export function useSites() {
             id: data.id,
             name: data.name,
             url: data.url,
+            category: data.category || 'all',
             user_site_id: data.id
           }
-          const newSites = [...sites, newSite]
-          saveOrder(newSites)
+          saveOrder([...sites, newSite])
         }
       } catch {
-        // fallback: add locally
         const newSite: SiteEntry = {
           id: `local-${Date.now()}`,
           name,
-          url
+          url,
+          category: category as SiteCategory
         }
         saveOrder([...sites, newSite])
       }
     } else {
-      // no supabase, add locally
       const newSite: SiteEntry = {
         id: `local-${Date.now()}`,
         name,
-        url
+        url,
+        category: category as SiteCategory
       }
       saveOrder([...sites, newSite])
     }

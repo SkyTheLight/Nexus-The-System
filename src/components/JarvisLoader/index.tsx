@@ -63,10 +63,20 @@ export default function JARVISLoader({
 
   // Staggered animation sequence
   useEffect(() => {
-    if (stage === 'initializing') {
-      // Show initialing for 1s, then start displaying
-      const timer = setTimeout(() => setStage('displaying'), 1000)
-      return () => clearTimeout(timer)
+  if (stage === 'initializing') {
+      return (
+        <div className="initializing">
+          INITIALIZING SYSTEMS...
+        </div>
+      )
+    }
+
+    if (weatherLoading) {
+      return (
+        <div className="jarvis-container">
+          <div className="initializing">ACQUIRING LOCATION...</div>
+        </div>
+      )
     }
 
     if (stage === 'displaying' && autoExit) {
@@ -153,14 +163,12 @@ export default function JARVISLoader({
 
             {/* Weather */}
             <div className="panel">
-              <div className="panel-label">
-                WEATHER — {weather?.city || 'LOCATION PENDING...'}
-              </div>
-              {weatherLoading ? (
-                <div className="empty-state">Loading weather...</div>
-              ) : weatherError ? (
-                <div className="empty-state">{weatherError}</div>
-              ) : weather ? (
+                <div className="panel-label">
+                  WEATHER — {weather?.city || 'LOCATION PENDING...'}
+                </div>
+                {weatherError ? (
+                  <div className="empty-state">{weatherError}</div>
+                ) : weather ? (
                 <div className="weather-info">
                   <div className="weather-temp">{weather.temp_c}°C</div>
                   <div className="weather-details">

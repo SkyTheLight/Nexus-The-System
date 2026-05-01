@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Clock, CheckCircle2, Target, TrendingUp } from 'lucide-react'
+import { Clock, CheckCircle2, Target } from 'lucide-react'
 
 export default function StatsCards() {
   const [stats, setStats] = useState({
@@ -12,7 +12,6 @@ export default function StatsCards() {
 
   useEffect(() => {
     loadStats()
-    // Reload every 30 seconds
     const interval = setInterval(loadStats, 30000)
     return () => clearInterval(interval)
   }, [])
@@ -51,34 +50,34 @@ export default function StatsCards() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4 animate-[fadeIn_0.3s_ease-out] hover:border-[var(--primary)]/50 transition-all duration-300">
-        <div className="flex items-center gap-2 mb-2">
-          <Clock size={16} className="text-[var(--primary)]" />
-          <span className="text-xs text-[var(--text-muted)]">Focus Hours Today</span>
+      <div className="widget-card stat-card-focus min-h-[90px]">
+        <div className="widget-card-header">
+          <div className="flex items-center gap-2">
+            <Clock size={16} className="text-[#00d4ff]" />
+            <span className="stat-card-label">FOCUS HOURS TODAY</span>
+          </div>
         </div>
-        <div className="text-2xl font-bold text-[var(--text)]">
-          {stats.focusHoursToday}h
-        </div>
+        <div className="stat-card-number">{stats.focusHoursToday}h</div>
       </div>
 
-      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4 animate-[fadeIn_0.3s_ease-out_0.1s] hover:border-[var(--primary)]/50 transition-all duration-300">
-        <div className="flex items-center gap-2 mb-2">
-          <CheckCircle2 size={16} className="text-green-400" />
-          <span className="text-xs text-[var(--text-muted)]">Tasks Done Today</span>
+      <div className="widget-card stat-card-tasks min-h-[90px]">
+        <div className="widget-card-header">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-[#22c55e]" />
+            <span className="stat-card-label">TASKS DONE TODAY</span>
+          </div>
         </div>
-        <div className="text-2xl font-bold text-[var(--text)]">
-          {stats.tasksDoneToday} tasks
-        </div>
+        <div className="stat-card-number">{stats.tasksDoneToday} tasks</div>
       </div>
 
-      <div className="bg-[var(--card-bg)] border border-[var(--border)] rounded-xl p-4 animate-[fadeIn_0.3s_ease-out_0.2s] hover:border-[var(--primary)]/50 transition-all duration-300">
-        <div className="flex items-center gap-2 mb-2">
-          <Target size={16} className="text-[var(--accent)]" />
-          <span className="text-xs text-[var(--text-muted)]">Goals Hit This Week</span>
+      <div className="widget-card stat-card-goals min-h-[90px]">
+        <div className="widget-card-header">
+          <div className="flex items-center gap-2">
+            <Target size={16} className="text-[#a855f7]" />
+            <span className="stat-card-label">GOALS HIT THIS WEEK</span>
+          </div>
         </div>
-        <div className="text-2xl font-bold text-[var(--text)]">
-          {stats.goalsHitWeek}
-        </div>
+        <div className="stat-card-number">{stats.goalsHitWeek}</div>
       </div>
     </div>
   )

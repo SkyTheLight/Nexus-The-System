@@ -15,8 +15,8 @@ export default function PomodoroTimer() {
 
   const minutes = Math.floor(timeLeft / 60)
   const seconds = timeLeft % 60
-  const progress = isWork 
-    ? ((WORK_TIME - timeLeft) / WORK_TIME) * 100 
+  const progress = isWork
+    ? ((WORK_TIME - timeLeft) / WORK_TIME) * 100
     : ((BREAK_TIME - timeLeft) / BREAK_TIME) * 100
 
   useEffect(() => {
@@ -24,7 +24,6 @@ export default function PomodoroTimer() {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
-          // Switch between work and break
           const nextIsWork = !isWork
           setIsWork(nextIsWork)
           return nextIsWork ? WORK_TIME : BREAK_TIME
@@ -43,7 +42,7 @@ export default function PomodoroTimer() {
   }
 
   return (
-    <div className="p-6 bg-[#0B0B0C] border border-white/10 rounded-2xl space-y-4">
+    <div className="p-6 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] space-y-4">
       <div className="flex items-center justify-between">
         {isEditing ? (
           <input
@@ -52,23 +51,23 @@ export default function PomodoroTimer() {
             onChange={(e) => setTimerName(e.target.value)}
             onBlur={() => setIsEditing(false)}
             onKeyDown={(e) => e.key === 'Enter' && setIsEditing(false)}
-            className="bg-transparent text-lg font-semibold text-white focus:outline-none"
+            className="bg-transparent text-lg font-semibold text-white outline-none"
             autoFocus
           />
         ) : (
           <h3
             onClick={() => setIsEditing(true)}
-            className="text-lg font-semibold cursor-pointer hover:opacity-80"
+            className="text-lg font-semibold text-white cursor-pointer hover:opacity-80"
           >
             {timerName}
           </h3>
         )}
-        <span className="text-sm text-muted-foreground">{isWork ? '25:00' : '5:00'}</span>
+        <span className="text-sm text-[var(--color-text-muted)]">{isWork ? '25:00' : '5:00'}</span>
       </div>
-      
-      <div className="relative h-2 bg-accent rounded-full overflow-hidden">
-        <div 
-          className={`h-full rounded-full transition-all duration-1000 ${isWork ? 'bg-primary' : 'bg-green-500'}`}
+
+      <div className="relative h-2 bg-[var(--color-border)] rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-1000 ${isWork ? 'bg-[var(--color-accent)]' : 'bg-[#22c55e]'}`}
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -82,16 +81,17 @@ export default function PomodoroTimer() {
       <div className="flex items-center justify-center gap-2">
         <button
           onClick={toggle}
-          className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm hover:bg-primary/20 transition-colors"
+          className="pomodoro-start"
         >
           {isRunning ? <Pause size={16} /> : <Play size={16} />}
           {isRunning ? 'Pause' : 'Start'}
         </button>
         <button
           onClick={reset}
-          className="p-2 hover:bg-accent rounded-lg transition-colors"
+          className="pomodoro-reset"
         >
-          <RotateCcw size={16} className="text-muted-foreground" />
+          <RotateCcw size={16} />
+          Reset
         </button>
       </div>
     </div>

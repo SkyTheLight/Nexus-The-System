@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useSites } from './useSites'
+import { useSites, type SiteEntry } from './useSites'
 import SiteButton from './SiteButton'
 import { Plus, X } from 'lucide-react'
 import {
@@ -21,8 +21,9 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import type { SiteCategory } from '@/lib/sites'
 
-function SortableSite({ site }: { site: any }) {
+function SortableSite({ site }: { site: SiteEntry }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: site.id,
   })
@@ -39,11 +40,20 @@ function SortableSite({ site }: { site: any }) {
   )
 }
 
+const CATEGORIES: { key: SiteCategory; label: string }[] = [
+  { key: 'ai', label: 'AI Tools' },
+  { key: 'school', label: 'School' },
+  { key: 'social', label: 'Social' },
+  { key: 'dev', label: 'Dev' },
+  { key: 'all', label: 'All' }
+]
+
 export default function SiteButtonsWidget() {
   const { sites, loading, saveOrder, addSite } = useSites()
   const [showForm, setShowForm] = useState(false)
   const [newName, setNewName] = useState('')
   const [newUrl, setNewUrl] = useState('')
+  const [activeCategory, setActiveCategory] = useState<SiteCategory>('all')
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -67,7 +77,7 @@ export default function SiteButtonsWidget() {
 
   const handleAdd = () => {
     if (!newName.trim() || !newUrl.trim()) return
-    addSite(newName.trim(), newUrl.trim())
+    addSite(newName.trim(), newUrl.trim(), activeCategory)
     setNewName('')
     setNewUrl('')
     setShowForm(false)
@@ -76,6 +86,10 @@ export default function SiteButtonsWidget() {
   const getPreviewFavicon = () => {
     try { return `https://www.google.com/s2/favicons?domain=${new URL(newUrl).hostname}&sz=64` } catch { return '' }
   }
+
+  const filteredSites = activeCategory === 'all'
+    ? sites
+    : sites.filter(s => s.category === activeCategory)
 
   if (loading) return <div className="text-muted-foreground text-sm p-4">LOADING...</div>
 
@@ -88,8 +102,34 @@ export default function SiteButtonsWidget() {
         </button>
       </div>
 
+      {/* Category filter tabs */}
+      <div className="flex gap-2 mb-3 overflow-x-auto">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.key}
+            onClick={() => setActiveCategory(cat.key)}
+            className={`text-[10px] px-2 py-1 rounded-full border transition-all ${
+              activeCategory === cat.key
+                ? 'border-[#00d4ff] text-[#00d4ff]'
+                : 'border-[#ffffff22] text-[#ffffff44] hover:border-[#ffffff44]'
+            }`}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
       {showForm && (
         <div className="mb-3 p-3 bg-[#0B0B0C] border border-[#00d4ff22] rounded-lg space-y-2">
+          <select
+            value={activeCategory}
+            onChange={e => setActiveCategory(e.target.value as SiteCategory)}
+            className="w-full px-2 py-1 text-xs bg-black border border-[#00d4ff22] rounded text-white font-mono"
+          >
+            {CATEGORIES.map(c => (
+              <option key={c.key} value={c.key}>{c.label}</option>
+            ))}
+          </select>
           <input
             type="text"
             value={newName}
@@ -120,16 +160,16 @@ export default function SiteButtonsWidget() {
       )}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={sites.map(s => s.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext items={filteredSites.map(s => s.id)} strategy={verticalListSortingStrategy}>
           <div className="flex-1 grid grid-cols-3 gap-2 overflow-y-auto">
-            {sites.map(site => (
+            {filteredSites.map(site => (
               <SortableSite key={site.id} site={site} />
             ))}
           </div>
         </SortableContext>
       </DndContext>
 
-      {sites.length === 0 && !showForm && (
+      {filteredSites.length === 0 && !showForm && (
         <div className="text-xs text-muted-foreground text-center py-4">No sites added</div>
       )}
     </div>
