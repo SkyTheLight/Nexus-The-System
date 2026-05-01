@@ -5,24 +5,42 @@ const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET
 const SPOTIFY_REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN
 
 async function getAccessToken() {
-  if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET || !SPOTIFY_REFRESH_TOKEN) {
-    return null
+  // If refresh token available, use it
+  if (SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET && SPOTIFY_REFRESH_TOKEN) {
+    try {
+      const response = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Basic ' + Buffer.from(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET).toString('base64')
+        },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: SPOTIFY_REFRESH_TOKEN
+        }).toString()
+      })
+      const data = await response.json()
+      if (data.access_token) return data.access_token
+    } catch (e) { console.error('Refresh token failed:', e) }
   }
 
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64')}`
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: SPOTIFY_REFRESH_TOKEN
-    })
-  })
+  // Fallback to client_credentials (doesn't require user auth)
+  if (SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET) {
+    try {
+      const response = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Basic ' + Buffer.from(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET).toString('base64')
+        },
+        body: 'grant_type=client_credentials'
+      })
+      const data = await response.json()
+      return data.access_token
+    } catch (e) { console.error('Client credentials failed:', e) }
+  }
 
-  const data = await response.json()
-  return data.access_token
+  return null
 }
 
 export async function GET(request: NextRequest) {
