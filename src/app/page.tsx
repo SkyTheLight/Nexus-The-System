@@ -213,7 +213,13 @@ export default function Home() {
   const { sidebarOpen } = useAppStore()
   const [layout, setLayout] = useState<DashboardWidget[]>([])
   const [loading, setLoading] = useState(true)
-  const [jarvisDone, setJarvisDone] = useState(false)
+  const [jarvisDone, setJarvisDone] = useState(() => {
+    // Persist across re-renders — JARVIS only runs once per session
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('jarvis-done') === 'true'
+    }
+    return false
+  })
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -225,6 +231,18 @@ export default function Home() {
   useEffect(() => {
     loadLayout()
   }, [])
+
+  // Safety net MUST be before any conditional returns (React rules of hooks)
+  // If JARVIS hasn't completed in 10s, force it through
+  useEffect(() => {
+    if (jarvisDone) return
+    const safetyNet = setTimeout(() => {
+      console.log('[PAGE] Safety net triggered - forcing JARVIS to complete')
+      sessionStorage.setItem('jarvis-done', 'true')
+      setJarvisDone(true)
+    }, 10000)
+    return () => clearTimeout(safetyNet)
+  }, [jarvisDone])
 
   function loadLayout() {
     console.log('Loading layout...')
@@ -342,22 +360,12 @@ export default function Home() {
         courseIds={[]}
         onComplete={() => {
           console.log('[PAGE] JARVIS onComplete called')
+          sessionStorage.setItem('jarvis-done', 'true')
           setJarvisDone(true)
         }}
       />
     )
   }
-
-  // Safety net: Force JARVIS to complete after 10s (Bug 5 fix)
-  useEffect(() => {
-    const safetyNet = setTimeout(() => {
-      if (!jarvisDone) {
-        console.log('[PAGE] Safety net triggered - forcing JARVIS to complete')
-        setJarvisDone(true)
-      }
-    }, 10000)
-    return () => clearTimeout(safetyNet)
-  }, [jarvisDone])
 
   const visibleWidgets = layout.filter(w => w.visible)
 
