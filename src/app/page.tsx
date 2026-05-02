@@ -224,8 +224,7 @@ export default function Home() {
     loadLayout()
   }, [])
 
-  // JARVIS removed - no safety net needed
-
+  
   function loadLayout() {
     console.log('Loading layout...')
     
