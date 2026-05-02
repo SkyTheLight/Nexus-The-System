@@ -340,13 +340,11 @@ export default function Home() {
         userName="Sir"
         canvasDomain={process.env.NEXT_PUBLIC_CANVAS_DOMAIN || ''}
         canvasToken={process.env.NEXT_PUBLIC_CANVAS_TOKEN || ''}
-        courseIds={[]} // Auto-fetch from enrollments
+        courseIds={[]}
         onComplete={() => {
           console.log('[PAGE] JARVIS onComplete called')
           setJarvisDone(true)
         }}
-        autoExit={true}
-        exitDelay={3000}
       />
     )
   }
