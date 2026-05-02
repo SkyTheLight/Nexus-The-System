@@ -315,7 +315,7 @@ export default function Home() {
 
   const hiddenWidgets = layout.filter(w => !w.visible)
 
-  const [jarvisDone, setJarvisDone] = useState(false)
+  const [jarvisDone, setJarvisDone] = useState(true) // Skip JARVIS loader for now
 
   console.log('[PAGE] loading:', loading, 'jarvisDone:', jarvisDone)
   console.log('[PAGE] CANVAS_DOMAIN:', process.env.NEXT_PUBLIC_CANVAS_DOMAIN ? 'set' : 'missing')
