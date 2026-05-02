@@ -40,7 +40,7 @@ export default function JARVISLoader({
     return () => clearInterval(timer)
   }, [])
 
-  // Auto-hide after 8 seconds - fire once on mount
+  // Auto-hide after 8 seconds
   useEffect(() => {
     console.log('[JARVIS] Starting 8s timer')
     const timer = setTimeout(() => {
@@ -49,7 +49,19 @@ export default function JARVISLoader({
       onComplete?.()
     }, 8000)
     return () => clearTimeout(timer)
-  }, [])
+  }, [onComplete])
+
+  // Safety net: Force complete after 10s regardless (Bug 5 fix)
+  useEffect(() => {
+    const safetyNet = setTimeout(() => {
+      if (visible) {
+        console.log('[JARVIS] Safety net triggered - forcing completion')
+        setVisible(false)
+        onComplete?.()
+      }
+    }, 10000)
+    return () => clearTimeout(safetyNet)
+  }, [visible, onComplete])
 
   if (!visible) return null
 
@@ -109,7 +121,7 @@ export default function JARVISLoader({
             <div className="empty-state">{weatherError}</div>
           ) : weather ? (
             <div className="weather-info">
-              <div className="weather-temp">{weather.temperature}°C</div>
+              <div className="weather-temp">{weather.temp_c}°C</div>
               <div className="weather-details">
                 <div className="weather-detail">{weather.weatherInfo?.label || weather.condition}</div>
                 <div className="weather-detail">Humidity: {weather.humidity}%</div>

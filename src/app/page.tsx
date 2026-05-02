@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
-// JARVISLoader removed - import commented out
-// import JARVISLoader from '@/components/JarvisLoader'
+import JARVISLoader from '@/components/JarvisLoader'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
 import TodoWidget from '@/components/widgets/Todo'
@@ -210,11 +209,11 @@ function SortableWidget({ widget, onHide, onResize }: { widget: DashboardWidget;
   )
 }
 
-// FORCE CACHE BUST - v2.0.1
 export default function Home() {
   const { sidebarOpen } = useAppStore()
   const [layout, setLayout] = useState<DashboardWidget[]>([])
   const [loading, setLoading] = useState(true)
+  const [jarvisDone, setJarvisDone] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -332,8 +331,33 @@ export default function Home() {
     )
   }
 
-  // JARVIS Loader temporarily removed to fix caching issues
-  // Will re-enable after fixing useEffect stage management
+  // Show JARVIS loader on first visit
+  if (!jarvisDone) {
+    console.log('[PAGE] Rendering JARVIS Loader...')
+    return (
+      <JARVISLoader
+        userName="Sir"
+        canvasDomain={process.env.NEXT_PUBLIC_CANVAS_DOMAIN || ''}
+        canvasToken={process.env.NEXT_PUBLIC_CANVAS_TOKEN || ''}
+        courseIds={[]}
+        onComplete={() => {
+          console.log('[PAGE] JARVIS onComplete called')
+          setJarvisDone(true)
+        }}
+      />
+    )
+  }
+
+  // Safety net: Force JARVIS to complete after 10s (Bug 5 fix)
+  useEffect(() => {
+    const safetyNet = setTimeout(() => {
+      if (!jarvisDone) {
+        console.log('[PAGE] Safety net triggered - forcing JARVIS to complete')
+        setJarvisDone(true)
+      }
+    }, 10000)
+    return () => clearTimeout(safetyNet)
+  }, [jarvisDone])
 
   const visibleWidgets = layout.filter(w => w.visible)
 

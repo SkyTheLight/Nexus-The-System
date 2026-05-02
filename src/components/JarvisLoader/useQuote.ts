@@ -14,16 +14,15 @@ export function useQuote() {
     setLoading(true)
 
     try {
-      const res = await fetch('https://zenquotes.io/api/random', {
+      // Use our API route (avoids CORS issues)
+      const res = await fetch('/api/quote', {
         signal: AbortSignal.timeout(5000)
       })
 
       if (res.ok) {
         const data = await res.json()
-        // zenquotes returns [{ q: "quote", a: "author" }]
-        const item = Array.isArray(data) ? data[0] : data
-        if (item?.q) {
-          setQuote({ quote: item.q, author: item.a || 'Unknown' })
+        if (data.content) {
+          setQuote({ quote: data.content, author: data.author || 'Unknown' })
           return
         }
       }
