@@ -100,8 +100,11 @@ export function useCanvasData(canvasDomain: string, canvasToken: string, courseI
           )
           if (!res.ok) return []
           const data = await res.json()
-          
-          return data
+
+          // Ensure data is an array
+          const assignmentsArray = Array.isArray(data) ? data : []
+
+          return assignmentsArray
             .filter((a: any) => {
               if (!a.due_at) return false
               const due = new Date(a.due_at)

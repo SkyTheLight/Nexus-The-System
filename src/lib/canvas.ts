@@ -44,7 +44,8 @@ export async function getCourses(): Promise<CanvasCourse[]> {
 }
 
 export async function getAssignments(courseId: number): Promise<CanvasAssignment[]> {
-  return canvasFetch(`/courses/${courseId}/assignments?order_by=due_at&per_page=100`)
+  const data = await canvasFetch(`/courses/${courseId}/assignments?order_by=due_at&per_page=100`)
+  return Array.isArray(data) ? data : []
 }
 
 export async function getAllAssignments(): Promise<CanvasAssignment[]> {
