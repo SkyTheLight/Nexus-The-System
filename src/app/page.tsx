@@ -210,6 +210,7 @@ function SortableWidget({ widget, onHide, onResize }: { widget: DashboardWidget;
   )
 }
 
+// FORCE CACHE BUST - v2.0.1
 export default function Home() {
   const { sidebarOpen } = useAppStore()
   const [layout, setLayout] = useState<DashboardWidget[]>([])
