@@ -151,7 +151,7 @@ export function useCanvasData(canvasDomain: string, canvasToken: string, courseI
     fetchData()
   }, [fetchData])
 
-  return { announcements, assignments, loading, refetch: fetchData }
+  return { announcements, assignments, canvasLoading: loading, refetch: fetchData }
 }
 
 function timeAgo(date: Date): string {
