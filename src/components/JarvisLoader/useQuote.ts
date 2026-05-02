@@ -14,14 +14,18 @@ export function useQuote() {
     setLoading(true)
 
     try {
-      const res = await fetch('https://api.quotable.io/random?tags=success|wisdom|education', {
+      const res = await fetch('https://zenquotes.io/api/random', {
         signal: AbortSignal.timeout(5000)
       })
 
       if (res.ok) {
         const data = await res.json()
-        setQuote({ quote: data.content, author: data.author })
-        return
+        // zenquotes returns [{ q: "quote", a: "author" }]
+        const item = Array.isArray(data) ? data[0] : data
+        if (item?.q) {
+          setQuote({ quote: item.q, author: item.a || 'Unknown' })
+          return
+        }
       }
     } catch (e) {
       console.error('Quote fetch failed:', e)

@@ -18,6 +18,9 @@ export function useWeather() {
     setLoading(true)
     setError(null)
 
+    let latitude: number | null = null
+    let longitude: number | null = null
+    
     try {
       // Get geolocation
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -33,27 +36,38 @@ export function useWeather() {
         })
       })
 
-      const { latitude, longitude } = position.coords
+      const { latitude: lat, longitude: lon } = position.coords
+      latitude = lat
+      longitude = lon
 
       // Fetch city name
       let city = 'Unknown Location'
-      try {
-        const geoRes = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
-          { headers: { 'User-Agent': 'Adversity/1.0' } }
-        )
-        const geoData = await geoRes.json()
-        city = geoData.address?.city ||
-              geoData.address?.municipality ||
-              geoData.address?.town ||
-              'Unknown'
-      } catch (e) {
-        console.error('Geocode failed:', e)
+      
+      // If using default coordinates (no geolocation), set city directly
+      if (latitude === null || longitude === null) {
+        city = 'Manila, PH'
+      } else {
+        try {
+          const geoRes = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            { headers: { 'User-Agent': 'Adversity/1.0' } }
+          )
+          const geoData = await geoRes.json()
+          city = geoData.address?.city ||
+                geoData.address?.municipality ||
+                geoData.address?.town ||
+                'Unknown'
+        } catch (e) {
+          console.error('Geocode failed:', e)
+        }
       }
 
-      // Fetch weather
+      // Fetch weather - use coordinates (either from geolocation or default Manila)
+      const lat = latitude ?? 14.5995
+      const lon = longitude ?? 120.9842
+      
       const weatherRes = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&timezone=auto`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&timezone=auto`
       )
       const weatherData = await weatherRes.json()
 
