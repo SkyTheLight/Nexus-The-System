@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { getGreeting, type FALLBACK_QUOTE } from './config'
+import { useState, useEffect } from 'react'
+import { getGreeting } from './config'
 import { useWeather } from './useWeather'
 import { useQuote } from './useQuote'
 import { useCanvasData } from './useCanvasData'
@@ -28,7 +28,6 @@ export default function JARVISLoader({
 }: JARVISLoaderProps) {
   const [stage, setStage] = useState<'initializing' | 'displaying' | 'exiting' | 'done'>('initializing')
   const [time, setTime] = useState(new Date())
-  const [error, setError] = useState<string | null>(null)
 
   console.log('[JARVIS] Rendering, stage:', stage, 'canvasDomain:', canvasDomain ? 'set' : 'missing')
 
@@ -41,70 +40,38 @@ export default function JARVISLoader({
     courseIds
   )
 
-  if (error) {
-    return (
-      <div className="jarvis-container">
-        <div className="initializing" style={{ color: 'red' }}>
-          SYSTEM ERROR: {error}
-          <br />
-          <button onClick={() => { setError(null); setStage('initializing') }} style={{ marginTop: 20, padding: '8px 16px', background: '#00d4ff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>
-            RETRY
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   // Live clock
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
 
-  // Use refs to avoid useEffect dependency issues
-  const stageRef = useRef(stage)
-  stageRef.current = stage
-
-  const onCompleteRef = useRef(onComplete)
-  onCompleteRef.current = onComplete
-
-  // Single useEffect that manages the entire sequence
+  // Simple sequence: initializing 2s -> displaying -> exit
   useEffect(() => {
-    const timers: NodeJS.Timeout[] = []
-
-    if (stageRef.current === 'initializing') {
-      // Show initializing for 2s
-      timers.push(setTimeout(() => {
+    if (stage === 'initializing') {
+      const t1 = setTimeout(() => {
+        console.log('[JARVIS] Transitioning to displaying')
         setStage('displaying')
-      }, 2000))
+      }, 2000)
+      return () => clearTimeout(t1)
     }
 
-    if (stageRef.current === 'displaying' && autoExit) {
-      // Show panels for exitDelay + 2000ms, then exit
-      timers.push(setTimeout(() => {
-        setStage('exiting')
-        timers.push(setTimeout(() => {
-          setStage('done')
-          onCompleteRef.current?.()
-        }, 1000))
-      }, exitDelay + 2000))
-    }
-
-    return () => timers.forEach(clearTimeout)
-  }, [autoExit, exitDelay])
-
-  // Auto exit after displaying
-  useEffect(() => {
     if (stage === 'displaying' && autoExit) {
-      const totalTime = exitDelay + 2000
-      const timer = setTimeout(() => {
+      const t2 = setTimeout(() => {
+        console.log('[JARVIS] Transitioning to exiting')
         setStage('exiting')
-        setTimeout(() => {
+        const t3 = setTimeout(() => {
+          console.log('[JARVIS] Transitioning to done')
           setStage('done')
           onComplete?.()
         }, 1000)
-      }, totalTime)
-      return () => clearTimeout(timer)
+        // Store t3 so we can clean it up
+        ;(t2 as any)._t3 = t3
+      }, exitDelay + 2000)
+      return () => {
+        clearTimeout(t2)
+        clearTimeout((t2 as any)._t3)
+      }
     }
   }, [stage, autoExit, exitDelay, onComplete])
 
