@@ -108,7 +108,7 @@ const defaultLayout: DashboardWidget[] = [
   // 'github-contributions': GitHubContributions,
   { widget_id: 'class-schedule', x: 6, y: 12, w: 2, h: 2, visible: true },
   { widget_id: 'canvas-announcements', x: 8, y: 12, w: 2, h: 2, visible: true },
-   { widget_id: 'screen-time', x: 10, y: 12, w: 2, h: 2, visible: false }, // Disabled: React error #310
+   { widget_id: 'screen-time', x: 10, y: 12, w: 2, h: 2, visible: true },
   ]
 
 function SortableWidget({ widget, onHide, onResize }: { widget: DashboardWidget; onHide: () => void; onResize: (w: number, h: number) => void }) {

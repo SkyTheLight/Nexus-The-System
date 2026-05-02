@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, Clock } from 'lucide-react'
 import { useScreenTime } from './useScreenTime'
 
@@ -22,6 +22,7 @@ export default function ScreenTimeWidget() {
   const [minutes, setMinutes] = useState(0)
 
   const [sessionSeconds, setSessionSeconds] = useState(0)
+  const [debugMode, setDebugMode] = useState(false)
 
   // Count up every second while tab is visible
   useEffect(() => {
@@ -35,6 +36,23 @@ export default function ScreenTimeWidget() {
   useEffect(() => {
     setSessionSeconds(Math.floor(sessionActiveMs / 1000))
   }, [sessionActiveMs])
+
+  // Set debug mode based on env
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      setDebugMode(true)
+    }
+  }, [])
+
+  // Track visibility state for debug indicator
+  const [isVisible, setIsVisible] = useState(true)
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsVisible(document.visibilityState === 'visible')
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [])
 
   const formatSession = (secs: number) => {
     const h = Math.floor(secs / 3600)
@@ -55,15 +73,6 @@ export default function ScreenTimeWidget() {
 
   const maxBarMs = Math.max(...weekHistory.map(d => d.activeMs), 1)
 
-  const [debugMode, setDebugMode] = useState(false)
-
-  useEffect(() => {
-    // Show debug indicator in development
-    if (process.env.NODE_ENV === 'development') {
-      setDebugMode(true)
-    }
-  }, [])
-
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
@@ -71,14 +80,14 @@ export default function ScreenTimeWidget() {
         <div className="flex items-center gap-2">
           {debugMode && (
             <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] ${
-              document?.visibilityState === 'visible'
+              isVisible
                 ? 'bg-[#22c55e33] text-[#22c55e] animate-pulse'
                 : 'bg-[#ffffff22] text-[#ffffff44]'
             }`}>
               <div className={`w-1.5 h-1.5 rounded-full ${
-                document?.visibilityState === 'visible' ? 'bg-[#22c55e]' : 'bg-[#ffffff44]'
+                isVisible ? 'bg-[#22c55e]' : 'bg-[#ffffff44]'
               }`} />
-              {document?.visibilityState === 'visible' ? 'TRACKING' : 'PAUSED'}
+              {isVisible ? 'TRACKING' : 'PAUSED'}
             </div>
           )}
           <button onClick={() => setShowForm(!showForm)} className="p-1 hover:bg-white/5 rounded transition-colors">
@@ -111,7 +120,7 @@ export default function ScreenTimeWidget() {
             return (
               <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
                 <div
-                  className={`w-full ${isToday ? 'bg-[#00d4ff]' : 'bg-[#00d4ff44]'} rounded-t`}
+                  className={`w-full ${isToday ? 'bg-[#00d4ff]' : 'bg-[#00d4ff44]'}`}
                   style={{ height: `${Math.max(heightPct, 4)}%` }}
                 />
                 <span className={`text-[8px] ${isToday ? 'text-[#00d4ff]' : 'text-[#00d4ff44]'}`}>{dayLabel}</span>
