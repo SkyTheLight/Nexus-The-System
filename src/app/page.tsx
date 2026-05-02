@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
-import JARVISLoader from '@/components/JarvisLoader'
+// JARVIS Loader removed
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
 import TodoWidget from '@/components/widgets/Todo'
@@ -213,14 +213,6 @@ export default function Home() {
   const { sidebarOpen } = useAppStore()
   const [layout, setLayout] = useState<DashboardWidget[]>([])
   const [loading, setLoading] = useState(true)
-  const [jarvisDone, setJarvisDone] = useState(() => {
-    // Persist across re-renders — JARVIS only runs once per session
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('jarvis-done') === 'true'
-    }
-    return false
-  })
-
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -232,17 +224,7 @@ export default function Home() {
     loadLayout()
   }, [])
 
-  // Safety net MUST be before any conditional returns (React rules of hooks)
-  // If JARVIS hasn't completed in 10s, force it through
-  useEffect(() => {
-    if (jarvisDone) return
-    const safetyNet = setTimeout(() => {
-      console.log('[PAGE] Safety net triggered - forcing JARVIS to complete')
-      sessionStorage.setItem('jarvis-done', 'true')
-      setJarvisDone(true)
-    }, 10000)
-    return () => clearTimeout(safetyNet)
-  }, [jarvisDone])
+  // JARVIS removed - no safety net needed
 
   function loadLayout() {
     console.log('Loading layout...')
@@ -346,24 +328,6 @@ export default function Home() {
           <div className="text-muted-foreground">Loading...</div>
         </main>
       </div>
-    )
-  }
-
-  // Show JARVIS loader on first visit
-  if (!jarvisDone) {
-    console.log('[PAGE] Rendering JARVIS Loader...')
-    return (
-      <JARVISLoader
-        userName="Sir"
-        canvasDomain={process.env.NEXT_PUBLIC_CANVAS_DOMAIN || ''}
-        canvasToken={process.env.NEXT_PUBLIC_CANVAS_TOKEN || ''}
-        courseIds={[]}
-        onComplete={() => {
-          console.log('[PAGE] JARVIS onComplete called')
-          sessionStorage.setItem('jarvis-done', 'true')
-          setJarvisDone(true)
-        }}
-      />
     )
   }
 
