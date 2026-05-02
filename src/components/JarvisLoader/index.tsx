@@ -63,20 +63,14 @@ export default function JARVISLoader({
 
   // Staggered animation sequence
   useEffect(() => {
-  if (stage === 'initializing') {
-      return (
-        <div className="initializing">
-          INITIALIZING SYSTEMS...
-        </div>
-      )
-    }
-
-    if (weatherLoading) {
-      return (
-        <div className="jarvis-container">
-          <div className="initializing">ACQUIRING LOCATION...</div>
-        </div>
-      )
+    if (stage === 'initializing') {
+      // Wait for weather and canvas to load before transitioning
+      if (!weatherLoading && !canvasLoading) {
+        const timer = setTimeout(() => {
+          setStage('displaying')
+        }, 1500)
+        return () => clearTimeout(timer)
+      }
     }
 
     if (stage === 'displaying' && autoExit) {
@@ -91,7 +85,7 @@ export default function JARVISLoader({
       }, totalTime)
       return () => clearTimeout(timer)
     }
-  }, [stage, autoExit, exitDelay, onComplete])
+  }, [stage, weatherLoading, canvasLoading, autoExit, exitDelay, onComplete])
 
   if (stage === 'done') return null
 
