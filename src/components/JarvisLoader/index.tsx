@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getGreeting, type FALLBACK_QUOTE } from './config'
 import { useWeather } from './useWeather'
 import { useQuote } from './useQuote'
@@ -61,21 +61,42 @@ export default function JARVISLoader({
     return () => clearInterval(timer)
   }, [])
 
-  // Staggered animation sequence
+  // Use refs to avoid useEffect dependency issues
+  const stageRef = useRef(stage)
+  stageRef.current = stage
+
+  const onCompleteRef = useRef(onComplete)
+  onCompleteRef.current = onComplete
+
+  // Single useEffect that manages the entire sequence
   useEffect(() => {
-    if (stage === 'initializing') {
-      // Wait for weather and canvas to load before transitioning
-      if (!weatherLoading && !canvasLoading) {
-        const timer = setTimeout(() => {
-          setStage('displaying')
-        }, 1500)
-        return () => clearTimeout(timer)
-      }
+    const timers: NodeJS.Timeout[] = []
+
+    if (stageRef.current === 'initializing') {
+      // Show initializing for 2s
+      timers.push(setTimeout(() => {
+        setStage('displaying')
+      }, 2000))
     }
 
+    if (stageRef.current === 'displaying' && autoExit) {
+      // Show panels for exitDelay + 2000ms, then exit
+      timers.push(setTimeout(() => {
+        setStage('exiting')
+        timers.push(setTimeout(() => {
+          setStage('done')
+          onCompleteRef.current?.()
+        }, 1000))
+      }, exitDelay + 2000))
+    }
+
+    return () => timers.forEach(clearTimeout)
+  }, [autoExit, exitDelay])
+
+  // Auto exit after displaying
+  useEffect(() => {
     if (stage === 'displaying' && autoExit) {
-      // Auto exit after all panels loaded + delay
-      const totalTime = exitDelay + 2000 // panels animation time
+      const totalTime = exitDelay + 2000
       const timer = setTimeout(() => {
         setStage('exiting')
         setTimeout(() => {
@@ -85,7 +106,7 @@ export default function JARVISLoader({
       }, totalTime)
       return () => clearTimeout(timer)
     }
-  }, [stage, weatherLoading, canvasLoading, autoExit, exitDelay, onComplete])
+  }, [stage, autoExit, exitDelay, onComplete])
 
   if (stage === 'done') return null
 
