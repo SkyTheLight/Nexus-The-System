@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
-import JARVISLoader from '@/components/JarvisLoader'
+// JARVISLoader removed - import commented out
+// import JARVISLoader from '@/components/JarvisLoader'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
 import TodoWidget from '@/components/widgets/Todo'
@@ -315,9 +316,7 @@ export default function Home() {
 
   const hiddenWidgets = layout.filter(w => !w.visible)
 
-  const [jarvisDone, setJarvisDone] = useState(true) // Skip JARVIS loader for now
-
-  console.log('[PAGE] loading:', loading, 'jarvisDone:', jarvisDone)
+  console.log('[PAGE] loading:', loading)
   console.log('[PAGE] CANVAS_DOMAIN:', process.env.NEXT_PUBLIC_CANVAS_DOMAIN ? 'set' : 'missing')
   console.log('[PAGE] CANVAS_TOKEN:', process.env.NEXT_PUBLIC_CANVAS_TOKEN ? 'set' : 'missing')
 
@@ -332,22 +331,8 @@ export default function Home() {
     )
   }
 
-  // Show JARVIS loader on first visit
-  if (!jarvisDone) {
-    console.log('[PAGE] Rendering JARVIS Loader...')
-    return (
-      <JARVISLoader
-        userName="Sir"
-        canvasDomain={process.env.NEXT_PUBLIC_CANVAS_DOMAIN || ''}
-        canvasToken={process.env.NEXT_PUBLIC_CANVAS_TOKEN || ''}
-        courseIds={[]}
-        onComplete={() => {
-          console.log('[PAGE] JARVIS onComplete called')
-          setJarvisDone(true)
-        }}
-      />
-    )
-  }
+  // JARVIS Loader temporarily removed to fix caching issues
+  // Will re-enable after fixing useEffect stage management
 
   const visibleWidgets = layout.filter(w => w.visible)
 
