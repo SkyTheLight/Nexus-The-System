@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CalendarDays, AlertTriangle, BookOpen, Clock } from 'lucide-react'
+import { CalendarDays, AlertTriangle, BookOpen, Clock, MapPin } from 'lucide-react'
 import { getPhilippineHolidays, type Holiday } from '@/lib/holidays'
+import { getTodayClasses } from '@/lib/classSchedule'
 
 export default function DateHighlightWidget() {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -12,14 +13,12 @@ export default function DateHighlightWidget() {
 
   useEffect(() => {
     setMounted(true)
-    // Load holidays
     const year = new Date().getFullYear()
     setHolidays([
       ...getPhilippineHolidays(year),
       ...getPhilippineHolidays(year + 1),
     ])
 
-    // Load assignments with deadlines
     fetch('/api/widget?type=assignments')
       .then(res => res.json())
       .then(data => setDeadlines(data.data || []))
@@ -37,13 +36,11 @@ export default function DateHighlightWidget() {
                        'July', 'August', 'September', 'October', 'November', 'December']
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-  // Get today's holidays
   const todaysHolidays = holidays.filter(h => {
     const hDate = new Date(h.date)
     return hDate.getDate() === day && hDate.getMonth() === month && hDate.getFullYear() === year
   })
 
-  // Get today's deadlines
   const todaysDeadlines = deadlines.filter(d => {
     if (!d.deadline) return false
     const deadlineDate = new Date(d.deadline)
@@ -51,6 +48,8 @@ export default function DateHighlightWidget() {
            deadlineDate.getMonth() === month &&
            deadlineDate.getFullYear() === year
   })
+
+  const todaysClasses = getTodayClasses()
 
   const getHolidayColor = (type: string) => {
     switch(type) {
@@ -63,16 +62,41 @@ export default function DateHighlightWidget() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Date Display */}
       <div className="text-center mb-4">
         <div className="text-5xl font-bold text-white">{day}</div>
         <div className="text-lg text-gray-300">{monthNames[month]} {year}</div>
         <div className="text-sm text-gray-400">{dayNames[today.getDay()]}</div>
       </div>
 
-      {/* Today's Events */}
       <div className="flex-1 space-y-3">
-        {/* Holidays */}
+        {todaysClasses.length > 0 && (
+          <div>
+            <h4 className="text-xs text-gray-400 uppercase mb-2 flex items-center gap-1">
+              <BookOpen size={12} />
+              Classes Today
+            </h4>
+            {todaysClasses.map(cls => (
+              cls.slots.map((slot, i) => (
+                <div key={`${cls.code}-${i}`} className="p-2 rounded bg-blue-900/30 border border-blue-700/50 mb-1">
+                  <div className="text-sm font-semibold text-white">{cls.code}</div>
+                  <div className="text-[11px] text-gray-300">{cls.title}</div>
+                  <div className="flex items-center gap-3 text-[10px] text-gray-400 mt-1">
+                    <span className="flex items-center gap-1">
+                      <Clock size={9} />
+                      {slot.start} – {slot.end}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <MapPin size={9} />
+                      {slot.room}
+                    </span>
+                  </div>
+                  <div className="text-[9px] text-gray-500 mt-0.5">{cls.instructor}</div>
+                </div>
+              ))
+            ))}
+          </div>
+        )}
+
         {todaysHolidays.length > 0 && (
           <div>
             <h4 className="text-xs text-gray-400 uppercase mb-2 flex items-center gap-1">
@@ -91,7 +115,6 @@ export default function DateHighlightWidget() {
           </div>
         )}
 
-        {/* Assignment Deadlines */}
         {todaysDeadlines.length > 0 && (
           <div>
             <h4 className="text-xs text-gray-400 uppercase mb-2 flex items-center gap-1">
@@ -109,8 +132,7 @@ export default function DateHighlightWidget() {
           </div>
         )}
 
-        {/* No Events */}
-        {todaysHolidays.length === 0 && todaysDeadlines.length === 0 && (
+        {todaysClasses.length === 0 && todaysHolidays.length === 0 && todaysDeadlines.length === 0 && (
           <div className="text-center py-4">
             <Clock size={32} className="mx-auto mb-2 text-gray-600" />
             <p className="text-sm text-gray-500">No events today</p>
@@ -119,9 +141,12 @@ export default function DateHighlightWidget() {
         )}
       </div>
 
-      {/* Quick Stats */}
       <div className="mt-4 pt-3 border-t border-gray-800">
-        <div className="grid grid-cols-2 gap-2 text-center">
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div className="text-lg font-bold text-white">{todaysClasses.length}</div>
+            <div className="text-xs text-gray-400">Classes</div>
+          </div>
           <div>
             <div className="text-lg font-bold text-white">{todaysHolidays.length}</div>
             <div className="text-xs text-gray-400">Holidays</div>

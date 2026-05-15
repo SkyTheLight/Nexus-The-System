@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Global CSS Variables - Dark Theme */
 :root {
   --color-bg: #000000;
@@ -244,3 +248,140 @@ body {
   --color-accent: #999999;
   --color-accent-muted: rgba(153, 153, 153, 0.5);
 }
+
+/* react-grid-layout handle customization */
+.react-resizable-handle {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+
+.widget-shell-group:hover .react-resizable-handle,
+.react-resizable-handle:hover {
+  opacity: 1 !important;
+}
+
+.react-resizable-handle::after {
+  border-color: var(--color-accent) !important;
+  opacity: 0.6;
+}
+
+.react-resizable-handle:hover::after {
+  opacity: 1;
+}
+
+.react-resizable-handle-n { top: 0 !important; left: 10% !important; width: 80% !important; height: 4px !important; cursor: ns-resize !important; }
+.react-resizable-handle-s { bottom: 0 !important; left: 10% !important; width: 80% !important; height: 4px !important; cursor: ns-resize !important; }
+.react-resizable-handle-w { left: 0 !important; top: 10% !important; width: 4px !important; height: 80% !important; cursor: ew-resize !important; }
+.react-resizable-handle-e { right: 0 !important; top: 10% !important; width: 4px !important; height: 80% !important; cursor: ew-resize !important; }
+.react-resizable-handle-nw { top: 0 !important; left: 0 !important; width: 10px !important; height: 10px !important; }
+.react-resizable-handle-ne { top: 0 !important; right: 0 !important; width: 10px !important; height: 10px !important; }
+.react-resizable-handle-sw { bottom: 0 !important; left: 0 !important; width: 10px !important; height: 10px !important; }
+.react-resizable-handle-se { bottom: 0 !important; right: 0 !important; width: 10px !important; height: 10px !important; }
+
+/* react-grid-layout base overrides */
+.react-grid-item.react-grid-placeholder {
+  background: #00aaff !important;
+  opacity: 0.08 !important;
+  border-radius: 2px !important;
+}
+
+/* ===== HUD THEME (Stark/SJW) ===== */
+
+@keyframes hud-pulse {
+  0%, 100% { border-top-color: rgba(0, 170, 255, 0.4); }
+  50% { border-top-color: rgba(0, 170, 255, 1); }
+}
+
+@keyframes hud-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes progress-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(0, 170, 255, 0.3); }
+  50% { box-shadow: 0 0 8px rgba(0, 170, 255, 0.6); }
+}
+
+.hud-card {
+  position: relative;
+  background: #090912;
+  border: 1px solid #1a1a2e;
+  border-top: 2px solid #00aaff;
+  border-radius: 2px;
+  padding: 16px;
+  overflow: hidden;
+  animation: hud-fade-in 300ms ease-out both;
+  transition: border-color 150ms ease;
+}
+
+.hud-card:hover {
+  border-color: #252545;
+}
+
+.hud-card::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid #7c3aed;
+  border-left: 2px solid #7c3aed;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hud-card::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 12px;
+  height: 12px;
+  border-bottom: 2px solid #7c3aed;
+  border-right: 2px solid #7c3aed;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hud-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1a1a2e;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+}
+
+.react-grid-item {
+  animation: hud-fade-in 300ms ease-out both;
+}
+
+.react-grid-item:nth-child(2) { animation-delay: 30ms; }
+.react-grid-item:nth-child(3) { animation-delay: 60ms; }
+.react-grid-item:nth-child(4) { animation-delay: 90ms; }
+.react-grid-item:nth-child(5) { animation-delay: 120ms; }
+.react-grid-item:nth-child(6) { animation-delay: 150ms; }
+.react-grid-item:nth-child(7) { animation-delay: 180ms; }
+
+.main-drag-handle {
+  cursor: grab;
+}
+.main-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Staggered animation for HUD cards */
+.hud-card:nth-child(1) { animation-delay: 0ms; }
+.hud-card:nth-child(2) { animation-delay: 40ms; }
+.hud-card:nth-child(3) { animation-delay: 80ms; }
+.hud-card:nth-child(4) { animation-delay: 120ms; }
+.hud-card:nth-child(5) { animation-delay: 160ms; }
+.hud-card:nth-child(6) { animation-delay: 200ms; }
+.hud-card:nth-child(7) { animation-delay: 240ms; }

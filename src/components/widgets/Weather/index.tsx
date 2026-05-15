@@ -10,7 +10,7 @@ const iconMap: Record<string, any> = {
 }
 
 export default function WeatherWidget() {
-  const { weather, loading, error, refetch } = useWeather()
+  const { weather, loading, error, refetch, usingPreset, selectedLocationIndex, switchLocation, locationPresets } = useWeather()
 
   if (loading) return <div className="text-muted-foreground text-sm p-4">LOADING...</div>
   if (error) return <div className="text-muted-foreground text-sm p-4">{error}</div>
@@ -22,7 +22,7 @@ export default function WeatherWidget() {
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm">WEATHER</h3>
-        <button onClick={refetch} className="p-1 hover:bg-white/5 rounded transition-colors">
+        <button onClick={() => refetch()} className="p-1 hover:bg-white/5 rounded transition-colors">
           <RefreshCw size={14} />
         </button>
       </div>
@@ -52,6 +52,24 @@ export default function WeatherWidget() {
         <div className="flex items-center gap-1 mt-3 text-xs text-[#00d4ff88]">
           <MapPin size={10} /> {weather.city}
         </div>
+
+        {usingPreset && (
+          <div className="flex gap-1 mt-3">
+            {locationPresets.map((loc, idx) => (
+              <button
+                key={idx}
+                onClick={() => switchLocation(idx)}
+                className={`px-2 py-1 text-xs rounded transition-colors ${
+                  idx === selectedLocationIndex
+                    ? 'bg-[#00d4ff] text-black'
+                    : 'bg-white/5 text-[#00d4ff88] hover:bg-white/10'
+                }`}
+              >
+                {loc.name.split(',')[0]}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

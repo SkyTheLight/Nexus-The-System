@@ -123,24 +123,36 @@ export default function AssignmentWidget() {
 
       <div className="space-y-3">
           {assignments.map((assignment: Assignment) => {
-          // Parse deadline as local time - datetime-local input gives local time
           const deadlineStr = assignment.deadline;
-          const [datePart, timePart] = deadlineStr.split('T');
-          const [yearStr, monthStr, dayStr] = datePart.split('-');
-          const [hourStr, minuteStr] = timePart.split(':');
-          const deadlineLocal = new Date(
-            parseInt(yearStr), 
-            parseInt(monthStr) - 1, 
-            parseInt(dayStr), 
-            parseInt(hourStr), 
-            parseInt(minuteStr)
-          ).getTime();
+          let deadlineLocal = 0;
+          let isUrgent = false;
+          let hoursLeft = 0;
+          let minutesLeft = 0;
+          let hoursLeftInt = 0;
+
+          if (deadlineStr) {
+            const [datePart, timePart] = deadlineStr.split('T');
+            if (datePart && timePart) {
+              const [yearStr, monthStr, dayStr] = datePart.split('-');
+              const [hourStr, minuteStr] = timePart.split(':');
+              if (yearStr && monthStr && dayStr && hourStr && minuteStr !== undefined) {
+                deadlineLocal = new Date(
+                  parseInt(yearStr), 
+                  parseInt(monthStr) - 1, 
+                  parseInt(dayStr), 
+                  parseInt(hourStr), 
+                  parseInt(minuteStr)
+                ).getTime();
+
+                const now = Date.now();
+                hoursLeft = (deadlineLocal - now) / (1000 * 60 * 60);
+                minutesLeft = Math.floor((hoursLeft - Math.floor(hoursLeft)) * 60);
+                hoursLeftInt = Math.floor(hoursLeft);
+                isUrgent = hoursLeft < 24 && hoursLeft > 0;
+              }
+            }
+          }
           
-          const now = Date.now();
-          const hoursLeft = (deadlineLocal - now) / (1000 * 60 * 60);
-          const minutesLeft = Math.floor((hoursLeft - Math.floor(hoursLeft)) * 60);
-          const hoursLeftInt = Math.floor(hoursLeft);
-          const isUrgent = hoursLeft < 24 && hoursLeft > 0;
           return (
             <div
               key={assignment.id}
