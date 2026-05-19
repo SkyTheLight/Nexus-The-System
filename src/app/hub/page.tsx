@@ -124,13 +124,6 @@ export default function HubPage() {
             </div>
           ) : (
             <div className="relative">
-              {/* Grid overlay */}
-              {gridOverlay && (
-                <div className="absolute inset-0 z-0 pointer-events-none" style={{
-                  backgroundImage: 'linear-gradient(rgba(215,179,106,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(215,179,106,0.04) 1px, transparent 1px)',
-                  backgroundSize: `${100 / 12}% 72px`,
-                }} />
-              )}
               <DashboardGrid
                 visibleWidgetIds={visibleWidgetIds}
                 displayLayouts={displayLayouts}
