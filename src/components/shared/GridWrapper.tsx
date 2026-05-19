@@ -109,7 +109,7 @@ function GridWrapperInner({
     const cw = (width - margin[0] * (COLS - 1)) / COLS
     for (const item of lg) {
       const p = saved?.get(item.i)
-      if (p && typeof p.x === 'number' && typeof p.y === 'number' && typeof p.width === 'number' && typeof p.height === 'number') {
+      if (p && Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.width) && Number.isFinite(p.height)) {
         merged.set(item.i, p)
       } else {
         merged.set(item.i, {
@@ -120,6 +120,7 @@ function GridWrapperInner({
         })
       }
     }
+    savePos(persistenceKey, merged)
     setWidgets(merged)
   }, [mounted, width, layouts, persistenceKey, rowHeight, margin])
 
