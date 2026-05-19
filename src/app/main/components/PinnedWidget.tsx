@@ -89,16 +89,16 @@ export default function PinnedWidget() {
   const firstLine = (text: string) => text.split('\n')[0].slice(0, 80)
 
   if (loading) {
-    return <div className="space-y-2"><div className="h-3 bg-[#1a1a2e] w-1/4 animate-pulse" /><div className="h-8 bg-[#1a1a2e] w-full animate-pulse" /><div className="h-8 bg-[#1a1a2e] w-3/4 animate-pulse" /></div>
+    return <div className="space-y-2"><div className="h-3 bg-[#12121c] w-1/4 animate-pulse" /><div className="h-8 bg-[#12121c] w-full animate-pulse" /><div className="h-8 bg-[#12121c] w-3/4 animate-pulse" /></div>
   }
   if (error) {
     return (
       <>
-<div className="hud-card-header main-drag-handle">
-          <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">■ INTEL BOARD</span>
+<div className="hud-card-header drag-handle">
+          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ INTEL BOARD</span>
           <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
-        <button onClick={fetchItems} className="text-[10px] font-mono text-[#00aaff] hover:underline text-left mt-2">Retry ↗</button>
+        <button onClick={fetchItems} className="text-[10px] font-mono text-[#d7b36a] hover:underline text-left mt-2">Retry ↗</button>
       </>
     )
   }
@@ -106,12 +106,12 @@ export default function PinnedWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">■ INTEL BOARD</span>
-        <span className="text-[8px] font-mono text-[#10b981] uppercase tracking-[0.15em]">{items.length} ITEMS</span>
+        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ INTEL BOARD</span>
+        <span className="text-[8px] font-mono text-[#22c55e] uppercase tracking-[0.15em]">{items.length} ITEMS</span>
       </div>
       <div className="flex-1 overflow-y-auto space-y-1.5">
         {items.length === 0 ? (
-          <div className="text-[11px] font-mono text-[#4a5568]">&gt; NO INTEL PINNED. ACCESS HUB TO PIN INTEL.</div>
+          <div className="text-[11px] font-mono text-[#6b5a30]">&gt; NO INTEL PINNED. ACCESS HUB TO PIN INTEL.</div>
         ) : (
           items.map(item => (
             <div key={`${item.type}-${item.id}`}>
@@ -120,16 +120,16 @@ export default function PinnedWidget() {
                 className="w-full text-left border-l-2 border-[#7c3aed] pl-2 py-1.5 hover:bg-[#111124] transition-colors duration-150"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[12px] font-mono font-bold text-[#e2e8f0] truncate">{item.title}</span>
-                  <span className="text-[8px] font-mono text-[#4a5568] uppercase tracking-[0.15em] shrink-0">{item.type}</span>
+                  <span className="text-[12px] font-mono font-bold text-[#f7f1e4] truncate">{item.title}</span>
+                  <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0">{item.type}</span>
                 </div>
                 {item.content && (
-                  <div className="text-[11px] font-mono text-[#4a5568] mt-0.5 truncate">{firstLine(item.content)}</div>
+                  <div className="text-[11px] font-mono text-[#6b5a30] mt-0.5 truncate">{firstLine(item.content)}</div>
                 )}
               </button>
               <button
                 onClick={() => togglePin(item)}
-                className="text-[8px] font-mono text-[#4a5568] hover:text-[#7c3aed] transition-colors mt-0.5 ml-2 uppercase tracking-[0.15em]"
+                className="text-[8px] font-mono text-[#6b5a30] hover:text-[#7c3aed] transition-colors mt-0.5 ml-2 uppercase tracking-[0.15em]"
               >
                 {items.some(p => p.id === item.id && p.type === item.type) ? '[ unpin ]' : '[ pin ]'}
               </button>
@@ -142,21 +142,21 @@ export default function PinnedWidget() {
         <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={() => setSelected(null)}>
           <div className="absolute inset-0 bg-black/60" />
           <div
-            className="relative bg-[#090912] border border-[#1a1a2e] p-5 max-w-lg w-full mx-4 max-h-[70vh] overflow-y-auto"
+            className="relative bg-[#0b0b13] border border-[rgba(215,179,106,0.22)] p-5 max-w-lg w-full mx-4 max-h-[70vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">{selected.type}</span>
-                <span className="text-[9px] font-mono text-[#4a5568]">#{selected.id}</span>
+                <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">{selected.type}</span>
+                <span className="text-[9px] font-mono text-[#6b5a30]">#{selected.id}</span>
               </div>
-              <button onClick={() => setSelected(null)} className="text-[#4a5568] hover:text-[#e2e8f0] text-sm font-mono transition-colors">[x]</button>
+              <button onClick={() => setSelected(null)} className="text-[#6b5a30] hover:text-[#f7f1e4] text-sm font-mono transition-colors">[x]</button>
             </div>
-            <h2 className="text-[14px] font-mono font-bold text-[#e2e8f0] mb-3">{selected.title}</h2>
-            <div className="text-[12px] font-mono text-[#4a5568] leading-relaxed whitespace-pre-wrap">{selected.content}</div>
+            <h2 className="text-[14px] font-mono font-bold text-[#f7f1e4] mb-3">{selected.title}</h2>
+            <div className="text-[12px] font-mono text-[#6b5a30] leading-relaxed whitespace-pre-wrap">{selected.content}</div>
             <button
               onClick={() => { togglePin(selected); setSelected(null) }}
-              className="mt-4 text-[9px] font-mono text-[#4a5568] hover:text-[#7c3aed] transition-colors uppercase tracking-[0.15em]"
+              className="mt-4 text-[9px] font-mono text-[#6b5a30] hover:text-[#7c3aed] transition-colors uppercase tracking-[0.15em]"
             >
               {items.some(p => p.id === selected.id && p.type === selected.type) ? '[ unpin ]' : '[ pin ]'}
             </button>

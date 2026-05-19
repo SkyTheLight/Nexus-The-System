@@ -7,8 +7,8 @@ import { SearchWrapper } from '@/components/SearchWrapper'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Adversity | Personal Command Center',
-  description: 'A minimalist personal productivity system',
+  title: 'Nexus: The System | Personal Command Center',
+  description: 'Your personal command center',
 }
 
 export default function RootLayout({

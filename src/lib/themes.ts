@@ -87,7 +87,24 @@ export const themes: Theme[] = [
       '--accent': '#999999',
     }
   },
+  {
+    name: 'Solo Leveling',
+    id: 'solo-leveling',
+    emoji: '🜃',
+    description: 'Hunter-gold HUD with shadow mana accents',
+    variables: {
+      '--background': '#06060a',
+      '--card-bg': '#0b0b13',
+      '--border': 'rgba(215, 179, 106, 0.18)',
+      '--text': '#f7f1e4',
+      '--text-muted': 'rgba(247, 241, 228, 0.62)',
+      '--primary': '#d7b36a',
+      '--primary-foreground': '#06060a',
+      '--accent': '#d7b36a',
+    }
+  },
 ]
+
 
 export function getTheme(id: string): Theme {
   return themes.find(t => t.id === id) || themes[0]

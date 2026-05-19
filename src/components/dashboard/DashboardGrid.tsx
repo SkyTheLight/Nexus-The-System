@@ -1,73 +1,66 @@
 'use client'
 
-import { useRef, useState, useEffect, useMemo } from 'react'
-import GridLayout from 'react-grid-layout'
-import 'react-grid-layout/css/styles.css'
-import 'react-resizable/css/styles.css'
+import { useMemo } from 'react'
+import { GridWrapper } from '@/components/shared/GridWrapper'
+import { useGridLayout } from '@/hooks/useGridLayout'
 import WidgetShell from './WidgetShell'
 import { WIDGET_REGISTRY } from '@/lib/widgetRegistry'
-import { GRID_GAP, ROW_HEIGHT } from '@/lib/gridUtils'
+import {
+  HUB_DEFAULT_LAYOUTS,
+  HUB_GRID,
+  layoutsForVisible,
+  mergeLayoutsPreservingHidden,
+} from '@/lib/layout'
 
 interface DashboardGridProps {
-  layout: { i: string; x: number; y: number; w: number; h: number; minW?: number; minH?: number; maxW?: number }[]
-  onLayoutChange: (layout: any[]) => void
+  visibleWidgetIds: string[]
   onHide: (id: string) => void
   onDelete: (id: string) => void
 }
 
-export default function DashboardGrid({ layout, onLayoutChange, onHide, onDelete }: DashboardGridProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [gridWidth, setGridWidth] = useState(700)
-
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    const ro = new ResizeObserver(entries => {
-      setGridWidth(entries[0].contentRect.width)
-    })
-    ro.observe(el)
-    const { width } = el.getBoundingClientRect()
-    if (width > 0) setGridWidth(width)
-    return () => ro.disconnect()
-  }, [])
+export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: DashboardGridProps) {
+  const { layouts, handleLayoutChange, loaded } = useGridLayout({
+    page: 'hub',
+    defaultLayouts: HUB_DEFAULT_LAYOUTS,
+    beforePersist: mergeLayoutsPreservingHidden,
+  })
 
   const registryById = useMemo(() => new Map(WIDGET_REGISTRY.map(w => [w.id, w])), [])
 
+  const displayLayouts = useMemo(
+    () => layoutsForVisible(layouts, visibleWidgetIds),
+    [layouts, visibleWidgetIds]
+  )
+
+  if (!loaded) {
+    return <div className="text-[var(--color-text-muted)] text-sm">Loading grid...</div>
+  }
+
   return (
-    <div ref={containerRef} className="w-full">
-      <GridLayout
-        className="layout"
-        layout={layout}
-        cols={12}
-        rowHeight={ROW_HEIGHT}
-        width={gridWidth}
-        gap={[GRID_GAP, GRID_GAP]}
-        onLayoutChange={onLayoutChange}
-        draggableHandle=".widget-drag-handle"
-        resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
-        compactType="vertical"
-        isResizable={true}
-        isDraggable={true}
-        useCSSTransforms={true}
-      >
-        {layout.map(item => {
-          const entry = registryById.get(item.i)
-          if (!entry) return null
-          const Component = entry.component
-          return (
-            <div key={item.i} className="widget-shell-group">
-              <WidgetShell
-                id={item.i}
-                label={entry.label}
-                onHide={() => onHide(item.i)}
-                onDelete={() => onDelete(item.i)}
-              >
-                <Component />
-              </WidgetShell>
-            </div>
-          )
-        })}
-      </GridLayout>
-    </div>
+    <GridWrapper
+      layouts={displayLayouts}
+      onLayoutChange={handleLayoutChange}
+      rowHeight={HUB_GRID.rowHeight}
+      margin={[...HUB_GRID.margin]}
+      draggableHandle=".widget-drag-bar"
+    >
+      {visibleWidgetIds.map(id => {
+        const entry = registryById.get(id)
+        if (!entry) return null
+        const Component = entry.component
+        return (
+          <div key={id} className="widget-shell-group">
+            <WidgetShell
+              id={id}
+              label={entry.label}
+              onHide={() => onHide(id)}
+              onDelete={() => onDelete(id)}
+            >
+              <Component />
+            </WidgetShell>
+          </div>
+        )
+      })}
+    </GridWrapper>
   )
 }

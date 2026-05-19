@@ -66,32 +66,35 @@ export default function GreetingWidget() {
   }
 
   return (
-    <div className="h-full flex flex-col justify-between">
-      <div>
-        <div className="text-[9px] font-mono text-[#4a5568] uppercase tracking-[0.25em] mb-1">[ SYSTEM ONLINE ]</div>
-        <div className="text-[20px] md:text-[22px] font-mono font-bold text-[#00aaff] leading-tight">
-          {getGreeting()} <span className="inline-block w-[10px] h-[22px] bg-[#00aaff] align-middle ml-0.5 animate-pulse" style={{ animationName: 'cursor-blink', animationDuration: '1s' }} />
+      <div className="h-full flex flex-col justify-between">
+        <div className="hud-card-header drag-handle">
+          <span className="text-[9px] font-mono text-[#6b5a30] uppercase tracking-[0.25em]">■ SYSTEM STATUS</span>
+          <span className="text-[9px] font-mono text-[#d7b36a]">ONLINE</span>
         </div>
-        <div className="text-[30px] md:text-[32px] font-mono font-bold text-[#00aaff] tabular-nums mt-1 leading-tight">{time}</div>
-        <div className="text-[12px] font-mono text-[#4a5568] mt-1">{getPHDate()}</div>
-      </div>
+        <div>
+          <div className="text-[20px] md:text-[22px] font-mono font-bold text-[#d7b36a] leading-tight">
+            {getGreeting()} <span className="inline-block w-[10px] h-[22px] bg-[#d7b36a] align-middle ml-0.5 animate-pulse" style={{ animationName: 'cursor-blink', animationDuration: '1s' }} />
+          </div>
+          <div className="text-[30px] md:text-[32px] font-mono font-bold text-[#d7b36a] tabular-nums mt-1 leading-tight">{time}</div>
+          <div className="text-[12px] font-mono text-[#6b5a30] mt-1">{getPHDate()}</div>
+        </div>
 
-      <div className="mt-3">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[8px] font-mono text-[#4a5568] uppercase tracking-[0.25em]">DAY PROGRESS</span>
-          <span className="text-[8px] font-mono text-[#a855f7]">{Math.round(progress)}%</span>
-        </div>
-        <div className="h-1 bg-[#1a1a2e] relative overflow-hidden" style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)' }}>
-          <div
-            className="h-full transition-all duration-1000 ease-linear"
-            style={{
-              width: `${progress}%`,
-              background: 'linear-gradient(90deg, #00aaff, #7c3aed)',
-              boxShadow: '0 0 6px rgba(0, 170, 255, 0.4)',
-            }}
-          />
+        <div className="mt-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.25em]">DAY PROGRESS</span>
+            <span className="text-[8px] font-mono text-[#7c3aed]">{Math.round(progress)}%</span>
+          </div>
+          <div className="h-1 bg-[#12121c] relative overflow-hidden" style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)' }}>
+            <div
+              className="h-full transition-all duration-1000 ease-linear"
+              style={{
+                width: `${progress}%`,
+                background: 'linear-gradient(90deg, #d7b36a, #7c3aed)',
+                boxShadow: '0 0 6px rgba(215, 179, 106, 0.4)',
+              }}
+            />
+          </div>
         </div>
       </div>
-    </div>
   )
 }

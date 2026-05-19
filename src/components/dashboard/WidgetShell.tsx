@@ -21,9 +21,9 @@ export default function WidgetShell({ label, onHide, onDelete, children }: Widge
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => { setHovered(false); setConfirmDelete(false) }}
     >
-      <div className="flex items-center justify-between px-3 py-2 border-b border-white/5 shrink-0">
+      <div className="widget-drag-bar flex items-center justify-between px-3 py-2 border-b border-white/5 shrink-0 cursor-grab active:cursor-grabbing">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="widget-drag-handle cursor-grab active:cursor-grabbing p-0.5 rounded hover:bg-white/10 transition-colors shrink-0">
+          <div className="p-0.5 rounded hover:bg-white/10 transition-colors shrink-0">
             <GripVertical size={13} className="text-[var(--color-text-muted)]" />
           </div>
           <span className="text-[11px] font-semibold text-[var(--color-text-muted)] uppercase tracking-wider truncate">
@@ -53,7 +53,7 @@ export default function WidgetShell({ label, onHide, onDelete, children }: Widge
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3">
+      <div className="widget-no-drag flex-1 overflow-y-auto p-3">
         {children}
       </div>
     </div>

@@ -72,12 +72,12 @@ export default function TasksWidget() {
   if (error) {
     return (
       <>
-<div className="hud-card-header main-drag-handle">
-          <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
+        <div className="hud-card-header drag-handle">
+          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
           <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
         <div className="flex-1 flex flex-col justify-center">
-          <button onClick={fetchTasks} className="text-[10px] font-mono text-[#00aaff] hover:underline text-left">Retry ↗</button>
+          <button onClick={fetchTasks} className="text-[10px] font-mono text-[#d7b36a] hover:underline text-left">Retry ↗</button>
         </div>
       </>
     )
@@ -86,15 +86,15 @@ export default function TasksWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
-        <span className="text-[8px] font-mono text-[#10b981] uppercase tracking-[0.15em]">
+        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
+        <span className="text-[8px] font-mono text-[#22c55e] uppercase tracking-[0.15em]">
           {tasks.length === 0 ? 'ALL CLEAR' : `${tasks.length} ACTIVE`}
         </span>
       </div>
       <div className="flex-1 flex flex-col">
         <div className="flex-1 space-y-1.5">
           {tasks.length === 0 ? (
-            <div className="text-[13px] font-mono text-[#10b981]">OBJECTIVES COMPLETE. WELL DONE, HUNTER.</div>
+            <div className="text-[13px] font-mono text-[#22c55e]">OBJECTIVES COMPLETE. WELL DONE, HUNTER.</div>
           ) : (
             tasks.map(task => (
               <div key={task.id} className="flex items-center gap-2 group"
@@ -102,11 +102,11 @@ export default function TasksWidget() {
               >
                 <button
                   onClick={() => toggleComplete(task.id)}
-                  className="w-4 h-4 border border-[#1a1a2e] hover:border-[#00aaff] transition-colors duration-150 shrink-0 flex items-center justify-center font-mono text-[10px] text-[#4a5568] group-hover:text-[#e2e8f0]"
+                  className="w-4 h-4 border border-[#1a1a2e] hover:border-[#d7b36a] transition-colors duration-150 shrink-0 flex items-center justify-center font-mono text-[10px] text-[#6b5a30] group-hover:text-[#d7b36a]"
                 >
                   [&nbsp;]
                 </button>
-                <span className="text-[12px] font-mono text-[#e2e8f0] truncate">{task.title}</span>
+                <span className="text-[12px] font-mono text-[#f7f1e4] truncate">{task.title}</span>
               </div>
             ))
           )}
@@ -117,18 +117,18 @@ export default function TasksWidget() {
           className="mt-2 pt-2 border-t border-[#1a1a2e]"
         >
           <div className="flex items-center gap-1">
-            <span className="text-[10px] font-mono text-[#4a5568]">&gt;</span>
+            <span className="text-[10px] font-mono text-[#6b5a30]">&gt;</span>
             <input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="ADD OBJECTIVE..."
-              className="flex-1 bg-transparent border-none px-1 py-1 text-[11px] font-mono text-[#e2e8f0] placeholder:text-[#4a5568] outline-none"
+              className="flex-1 bg-transparent border-none px-1 py-1 text-[11px] font-mono text-[#f7f1e4] placeholder:text-[#6b5a30] outline-none"
               disabled={adding}
             />
             <button
               type="submit"
               disabled={!newTitle.trim() || adding}
-              className="text-[9px] font-mono text-[#4a5568] hover:text-[#00aaff] disabled:opacity-30 transition-colors uppercase tracking-[0.15em]"
+              className="text-[9px] font-mono text-[#6b5a30] hover:text-[#d7b36a] disabled:opacity-30 transition-colors uppercase tracking-[0.15em]"
             >
               ADD
             </button>

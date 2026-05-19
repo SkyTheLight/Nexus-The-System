@@ -69,4 +69,5 @@ export const DEFAULT_WIDGET_ORDER = [
   'dev', 'ai-chat',
 ]
 
+/** @deprecated Use LAYOUT_STORAGE_KEYS from `@/lib/layout` */
 export const STORAGE_KEY = 'adversity-dashboard-layout'

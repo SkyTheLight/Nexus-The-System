@@ -91,16 +91,16 @@ export default function ClassesWidget() {
   useEffect(() => { fetchData() }, [fetchData])
 
   if (loading) {
-    return <div className="space-y-2"><div className="h-3 bg-[#1a1a2e] w-1/3 animate-pulse" /><div className="h-8 bg-[#1a1a2e] w-full animate-pulse" /><div className="h-8 bg-[#1a1a2e] w-full animate-pulse" /></div>
+    return <div className="space-y-2"><div className="h-3 bg-[#12121c] w-1/3 animate-pulse" /><div className="h-8 bg-[#12121c] w-full animate-pulse" /><div className="h-8 bg-[#12121c] w-full animate-pulse" /></div>
   }
   if (error) {
     return (
       <>
-<div className="hud-card-header main-drag-handle">
-          <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">■ TRAINING SCHEDULE</span>
+<div className="hud-card-header drag-handle">
+          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ TRAINING SCHEDULE</span>
           <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
-        <button onClick={fetchData} className="text-[10px] font-mono text-[#00aaff] hover:underline text-left mt-2">Retry ↗</button>
+        <button onClick={fetchData} className="text-[10px] font-mono text-[#d7b36a] hover:underline text-left mt-2">Retry ↗</button>
       </>
     )
   }
@@ -111,7 +111,7 @@ export default function ClassesWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">■ TRAINING SCHEDULE</span>
+        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ TRAINING SCHEDULE</span>
         {assignments.some(a => daysUntil(a.deadline) === 0) && (
           <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">[ CRITICAL ]</span>
         )}
@@ -119,9 +119,9 @@ export default function ClassesWidget() {
       <div className="flex-1 overflow-y-auto space-y-2">
         {/* Today's Classes */}
         <div>
-          <div className="text-[8px] font-mono text-[#4a5568] uppercase tracking-[0.25em] mb-1">TODAY'S SESSIONS</div>
+          <div className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.25em] mb-1">TODAY'S SESSIONS</div>
           {todayClasses.length === 0 ? (
-            <div className="text-[11px] font-mono text-[#4a5568]">&gt; NO TRAINING SCHEDULED TODAY, HUNTER.</div>
+            <div className="text-[11px] font-mono text-[#6b5a30]">&gt; NO TRAINING SCHEDULED TODAY, HUNTER.</div>
           ) : (
             <div className="space-y-1">
               {todayClasses.map(cls =>
@@ -132,15 +132,15 @@ export default function ClassesWidget() {
                     <div
                       key={`${cls.code}-${i}`}
                       className={`flex items-center justify-between py-1 px-1 ${
-                        active ? 'border-l-2 border-[#00aaff] bg-[#111124]' : ''
+                        active ? 'border-l-2 border-[#d7b36a] bg-[#111124]' : ''
                       } ${past ? 'opacity-40' : ''}`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] font-mono text-[#00aaff] tabular-nums shrink-0">{slot.start}</span>
-                        <span className="text-[11px] font-mono text-[#e2e8f0] truncate">{cls.code}</span>
+                        <span className="text-[10px] font-mono text-[#d7b36a] tabular-nums shrink-0">{slot.start}</span>
+                        <span className="text-[11px] font-mono text-[#f7f1e4] truncate">{cls.code}</span>
                       </div>
                       {active && (
-                        <span className="text-[8px] font-mono text-[#00aaff] uppercase tracking-[0.2em] shrink-0 ml-2">[ ACTIVE ]</span>
+                        <span className="text-[8px] font-mono text-[#d7b36a] uppercase tracking-[0.2em] shrink-0 ml-2">[ ACTIVE ]</span>
                       )}
                     </div>
                   )
@@ -152,9 +152,9 @@ export default function ClassesWidget() {
 
         {/* Upcoming Assignments */}
         <div className="pt-2 border-t border-[#1a1a2e]">
-          <div className="text-[8px] font-mono text-[#4a5568] uppercase tracking-[0.25em] mb-1">DEPLOYMENTS DUE</div>
+          <div className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.25em] mb-1">DEPLOYMENTS DUE</div>
           {assignments.length === 0 ? (
-            <div className="text-[11px] font-mono text-[#4a5568]">&gt; NO PENDING DEPLOYMENTS.</div>
+            <div className="text-[11px] font-mono text-[#6b5a30]">&gt; NO PENDING DEPLOYMENTS.</div>
           ) : (
             <div className="space-y-1">
               {assignments.map(a => {
@@ -167,13 +167,13 @@ export default function ClassesWidget() {
                   <div key={a.id} className="flex items-center justify-between py-0.5">
                     <div className="flex items-center gap-2 min-w-0">
                       {a.course && (
-                        <span className="text-[8px] font-mono text-[#4a5568] uppercase tracking-[0.15em] shrink-0">{a.course}</span>
+                        <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0">{a.course}</span>
                       )}
-                      <span className="text-[11px] font-mono text-[#e2e8f0] truncate">{a.title}</span>
+                      <span className="text-[11px] font-mono text-[#f7f1e4] truncate">{a.title}</span>
                     </div>
                     <span
                       className="text-[8px] font-mono uppercase tracking-[0.15em] shrink-0 ml-2"
-                      style={{ color: isCritical ? '#ef4444' : isUrgent ? '#f59e0b' : '#00aaff' }}
+                      style={{ color: isCritical ? '#ef4444' : isUrgent ? '#f59e0b' : '#d7b36a' }}
                     >
                       [{isCritical ? 'CRITICAL' : isUrgent ? 'URGENT' : 'PENDING'}]
                     </span>

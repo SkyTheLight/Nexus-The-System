@@ -58,21 +58,21 @@ export default function PHNewsWidget() {
     switch (u) {
       case 'high': return { color: '#ef4444', label: 'HIGH' }
       case 'medium': return { color: '#f59e0b', label: 'MED' }
-      default: return { color: '#00aaff', label: 'LOW' }
+      default: return { color: '#d7b36a', label: 'LOW' }
     }
   }
 
   if (loading) {
-    return <div className="space-y-2"><div className="h-3 bg-[#1a1a2e] w-1/4 animate-pulse" /><div className="h-10 bg-[#1a1a2e] w-full animate-pulse" /><div className="h-10 bg-[#1a1a2e] w-full animate-pulse" /></div>
+    return <div className="space-y-2"><div className="h-3 bg-[#12121c] w-1/4 animate-pulse" /><div className="h-10 bg-[#12121c] w-full animate-pulse" /><div className="h-10 bg-[#12121c] w-full animate-pulse" /></div>
   }
   if (error && news.length === 0) {
     return (
       <>
-<div className="hud-card-header main-drag-handle">
-          <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">■ WORLD THREAT LEVEL</span>
+<div className="hud-card-header drag-handle">
+          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ WORLD THREAT LEVEL</span>
           <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
-        <button onClick={fetchNews} className="text-[10px] font-mono text-[#00aaff] hover:underline text-left mt-2">Retry ↗</button>
+        <button onClick={fetchNews} className="text-[10px] font-mono text-[#d7b36a] hover:underline text-left mt-2">Retry ↗</button>
       </>
     )
   }
@@ -80,15 +80,15 @@ export default function PHNewsWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#00aaff] uppercase tracking-[0.25em]">■ WORLD THREAT LEVEL</span>
+        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ WORLD THREAT LEVEL</span>
         <div className="flex items-center gap-2">
-          {cached && <span className="text-[8px] font-mono text-[#4a5568] uppercase tracking-[0.15em]">CACHED</span>}
-          <button onClick={fetchNews} className="text-[9px] font-mono text-[#4a5568] hover:text-[#00aaff] transition-colors">↻</button>
+          {cached && <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.15em]">CACHED</span>}
+          <button onClick={fetchNews} className="text-[9px] font-mono text-[#6b5a30] hover:text-[#d7b36a] transition-colors">↻</button>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto max-h-[160px] space-y-1.5">
         {news.length === 0 ? (
-          <div className="text-[11px] font-mono text-[#4a5568]">&gt; NO INTEL AVAILABLE.</div>
+          <div className="text-[11px] font-mono text-[#6b5a30]">&gt; NO INTEL AVAILABLE.</div>
         ) : (
           news.map((item, i) => {
             const attrs = urgencyAttrs(item.urgency)
@@ -101,10 +101,10 @@ export default function PHNewsWidget() {
                   >
                     [{attrs.label}]
                   </span>
-                  <span className="text-[8px] font-mono text-[#4a5568] uppercase tracking-[0.1em] shrink-0">[{item.category?.toUpperCase() || 'GENERAL'}]</span>
+                  <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.1em] shrink-0">[{item.category?.toUpperCase() || 'GENERAL'}]</span>
                 </div>
-                <div className="text-[11px] font-mono text-[#e2e8f0] mt-0.5">{item.title}</div>
-                <div className="text-[10px] font-mono text-[#4a5568] mt-0.5">{item.summary}</div>
+                <div className="text-[11px] font-mono text-[#f7f1e4] mt-0.5">{item.title}</div>
+                <div className="text-[10px] font-mono text-[#6b5a30] mt-0.5">{item.summary}</div>
               </div>
             )
           })
