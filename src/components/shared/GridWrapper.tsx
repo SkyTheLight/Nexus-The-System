@@ -115,7 +115,7 @@ export function GridWrapper({
     return () => window.removeEventListener("beforeunload", flush)
   }, [persistenceKey])
 
-  /* Initialize / merge: load saved pixel positions, then overlay any layout
+  /* Initialize / merge: load saved pixel positions, then add any layout
      widgets not yet in the map (newly added widgets). */
   useEffect(() => {
     if (!mounted || width === 0) return
@@ -140,155 +140,180 @@ export function GridWrapper({
     setWidgets(merged)
   }, [mounted, width, layouts, persistenceKey, rowHeight, margin])
 
-  /* ── Interaction ── */
-  const handleWidgetMouseDown = (e: React.MouseEvent, widgetId: string) => {
-    e.preventDefault()
+  /* ── Interaction using refs to avoid stale closures ── */
 
-    const startX = e.clientX
-    const startY = e.clientY
-    const startPos = widgets.get(widgetId)
+  /* Refs for props used in document-level handlers */
+  const onLayoutChangeRef = useRef(onLayoutChange)
+  onLayoutChangeRef.current = onLayoutChange
+  const layoutsRef = useRef(layouts)
+  layoutsRef.current = layouts
+  const widthRef = useRef(width)
+  widthRef.current = width
+  const rowHeightRef = useRef(rowHeight)
+  rowHeightRef.current = rowHeight
+  const marginRef = useRef(margin[0])
+  marginRef.current = margin[0]
+  const persistenceKeyRef = useRef(persistenceKey)
+  persistenceKeyRef.current = persistenceKey
+
+  /* Drag state ref (no React state, just refs for perf) */
+  const dragRef = useRef<{
+    widgetId: string
+    startX: number
+    startY: number
+    startPos: LayoutPosition
+    isResize: boolean
+    nearRight: boolean
+    nearBottom: boolean
+    nearLeft: boolean
+    nearTop: boolean
+  } | null>(null)
+
+  /* Document-level pointermove / pointerup handler */
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      const d = dragRef.current
+      if (!d) return
+
+      const dx = e.clientX - d.startX
+      const dy = e.clientY - d.startY
+
+      if (!d.isResize) {
+        setDraggingWidget(d.widgetId)
+        setWidgets(prev => {
+          const cur = prev.get(d.widgetId)
+          if (!cur) return prev
+          const next = new Map(prev)
+          next.set(d.widgetId, {
+            ...cur,
+            x: Math.max(0, d.startPos.x + dx),
+            y: Math.max(0, d.startPos.y + dy),
+          })
+          return next
+        })
+      } else {
+        setResizingWidget(d.widgetId)
+        setWidgets(prev => {
+          const cur = prev.get(d.widgetId)
+          if (!cur) return prev
+          let nx = d.startPos.x
+          let ny = d.startPos.y
+          let nw = d.startPos.width
+          let nh = d.startPos.height
+
+          if (d.nearRight) nw = Math.max(MIN_SIZE, d.startPos.width + dx)
+          if (d.nearBottom) nh = Math.max(MIN_SIZE, d.startPos.height + dy)
+          if (d.nearLeft) {
+            const dw = -dx
+            if (d.startPos.width + dw >= MIN_SIZE) {
+              nw = d.startPos.width + dw
+              nx = d.startPos.x - dw
+            }
+          }
+          if (d.nearTop) {
+            const dh = -dy
+            if (d.startPos.height + dh >= MIN_SIZE) {
+              nh = d.startPos.height + dh
+              ny = d.startPos.y - dh
+            }
+          }
+
+          const next = new Map(prev)
+          next.set(d.widgetId, {
+            x: Math.max(0, nx),
+            y: Math.max(0, ny),
+            width: nw,
+            height: nh,
+          })
+          return next
+        })
+      }
+    }
+
+    const handlePointerUp = () => {
+      const d = dragRef.current
+      dragRef.current = null
+      setDraggingWidget(null)
+      setResizingWidget(null)
+
+      if (!d) return
+
+      savePixelPositions(persistenceKeyRef.current, widgetsRef.current)
+
+      const w = widthRef.current
+      if (w > 0) {
+        const finalPos = widgetsRef.current.get(d.widgetId)
+        if (finalPos) {
+          const gi = pixelsToGrid(d.widgetId, finalPos, w, COLS, rowHeightRef.current, marginRef.current)[0]
+          const lg = layoutsRef.current.lg ?? []
+          const newLg = lg.map(item =>
+            item.i === d.widgetId
+              ? { ...item, x: gi.x, y: gi.y, w: gi.w, h: gi.h }
+              : item
+          )
+          onLayoutChangeRef.current(newLg, { ...layoutsRef.current, lg: newLg })
+        }
+      }
+    }
+
+    document.addEventListener("pointermove", handlePointerMove)
+    document.addEventListener("pointerup", handlePointerUp)
+    return () => {
+      document.removeEventListener("pointermove", handlePointerMove)
+      document.removeEventListener("pointerup", handlePointerUp)
+    }
+  }, [])
+
+  const handlePointerDown = (e: React.PointerEvent, widgetId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const startPos = widgetsRef.current.get(widgetId)
     if (!startPos) return
 
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const relX = e.clientX - rect.left
     const relY = e.clientY - rect.top
-    const isNearRight = relX > rect.width - EDGE_THRESHOLD
-    const isNearBottom = relY > rect.height - EDGE_THRESHOLD
-    const isNearLeft = relX < EDGE_THRESHOLD
-    const isNearTop = relY < EDGE_THRESHOLD
 
-    const isResize = isNearRight || isNearBottom || isNearLeft || isNearTop
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - startX
-      const deltaY = moveEvent.clientY - startY
-
-      if (!isResize) {
-        setDraggingWidget(widgetId)
-        const newLayout = new Map(widgets)
-        const currentWidget = newLayout.get(widgetId)
-        if (currentWidget) {
-          newLayout.set(widgetId, {
-            ...currentWidget,
-            x: Math.max(0, startPos.x + deltaX),
-            y: Math.max(0, startPos.y + deltaY),
-          })
-          setWidgets(newLayout)
-        }
-      } else {
-        setResizingWidget(widgetId)
-        const newLayout = new Map(widgets)
-        const currentWidget = newLayout.get(widgetId)
-        if (currentWidget) {
-          let newX = currentWidget.x
-          let newY = currentWidget.y
-          let newWidth = currentWidget.width
-          let newHeight = currentWidget.height
-
-          if (isNearRight) newWidth = Math.max(MIN_SIZE, currentWidget.width + deltaX)
-          if (isNearBottom) newHeight = Math.max(MIN_SIZE, currentWidget.height + deltaY)
-          if (isNearLeft) {
-            const deltaW = -deltaX
-            if (currentWidget.width + deltaW >= MIN_SIZE) {
-              newWidth = currentWidget.width + deltaW
-              newX = currentWidget.x - deltaW
-            }
-          }
-          if (isNearTop) {
-            const deltaH = -deltaY
-            if (currentWidget.height + deltaH >= MIN_SIZE) {
-              newHeight = currentWidget.height + deltaH
-              newY = currentWidget.y - deltaH
-            }
-          }
-
-          newLayout.set(widgetId, {
-            x: Math.max(0, newX),
-            y: Math.max(0, newY),
-            width: newWidth,
-            height: newHeight,
-          })
-          setWidgets(newLayout)
-        }
-      }
+    dragRef.current = {
+      widgetId,
+      startX: e.clientX,
+      startY: e.clientY,
+      startPos,
+      isResize: false,
+      nearRight: relX > rect.width - EDGE_THRESHOLD,
+      nearBottom: relY > rect.height - EDGE_THRESHOLD,
+      nearLeft: relX < EDGE_THRESHOLD,
+      nearTop: relY < EDGE_THRESHOLD,
     }
-
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-      setDraggingWidget(null)
-      setResizingWidget(null)
-
-      savePixelPositions(persistenceKey, widgetsRef.current)
-
-      if (width > 0) {
-        const finalPos = widgetsRef.current.get(widgetId)
-        if (finalPos) {
-          const gridItem = pixelsToGrid(widgetId, finalPos, width, COLS, rowHeight, margin[0])[0]
-          const lg = layouts.lg ?? []
-          const newLg = lg.map(item =>
-            item.i === widgetId
-              ? { ...item, x: gridItem.x, y: gridItem.y, w: gridItem.w, h: gridItem.h }
-              : item
-          )
-          onLayoutChange(newLg, { ...layouts, lg: newLg })
-        }
-      }
-    }
-
-    document.addEventListener('mousemove', handleMouseMove, { passive: true })
-    document.addEventListener('mouseup', handleMouseUp, { once: true })
+    dragRef.current.isResize =
+      dragRef.current.nearRight ||
+      dragRef.current.nearBottom ||
+      dragRef.current.nearLeft ||
+      dragRef.current.nearTop
   }
 
-  const renderWidget = (id: string, pos: LayoutPosition) => {
-    const isDragging = draggingWidget === id
-    const isResizing = resizingWidget === id
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const relX = e.clientX - rect.left
+    const relY = e.clientY - rect.top
 
-    return (
-      <div
-        key={id}
-        onMouseDown={(e) => handleWidgetMouseDown(e, id)}
-        onMouseMove={(e) => {
-          const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-          const relX = e.clientX - rect.left
-          const relY = e.clientY - rect.top
+    const nl = relX < EDGE_THRESHOLD
+    const nr = relX > rect.width - EDGE_THRESHOLD
+    const nt = relY < EDGE_THRESHOLD
+    const nb = relY > rect.height - EDGE_THRESHOLD
 
-          const nl = relX < EDGE_THRESHOLD
-          const nr = relX > rect.width - EDGE_THRESHOLD
-          const nt = relY < EDGE_THRESHOLD
-          const nb = relY > rect.height - EDGE_THRESHOLD
+    let cursor = 'move'
+    if ((nl && nt) || (nr && nb)) cursor = 'nwse-resize'
+    else if ((nr && nt) || (nl && nb)) cursor = 'nesw-resize'
+    else if (nr || nl) cursor = 'ew-resize'
+    else if (nt || nb) cursor = 'ns-resize'
 
-          let cursor = 'move'
-          if ((nl && nt) || (nr && nb)) cursor = 'nwse-resize'
-          else if ((nr && nt) || (nl && nb)) cursor = 'nesw-resize'
-          else if (nr || nl) cursor = 'ew-resize'
-          else if (nt || nb) cursor = 'ns-resize'
-
-          if (cursor !== cursors[id]) setCursors(prev => ({ ...prev, [id]: cursor }))
-        }}
-        className="absolute"
-        style={{
-          left: pos.x,
-          top: pos.y,
-          width: pos.width,
-          height: pos.height,
-          cursor: cursors[id] ?? 'move',
-          zIndex: isDragging || isResizing ? 100 : 1,
-          userSelect: 'none',
-          touchAction: 'none',
-          transition: isDragging || isResizing ? 'none' : 'box-shadow 0.15s',
-          boxShadow: isDragging || isResizing ? '0 8px 32px rgba(0,0,0,0.5)' : 'none',
-        }}
-      >
-        {React.Children.map(children, (child) => {
-          if (React.isValidElement(child) && String(child.key) === id) {
-            return child
-          }
-          return null
-        })}
-      </div>
-    )
-  }
+    const id = (e.currentTarget as HTMLElement).dataset.widgetId
+    if (id && cursor !== cursors[id]) {
+      setCursors(prev => ({ ...prev, [id]: cursor }))
+    }
+  }, [cursors])
 
   if (!mounted) return <div ref={containerRef} style={{ width: '100%', minHeight: 400 }} />
 
@@ -299,11 +324,39 @@ export function GridWrapper({
   return (
     <div ref={containerRef} style={{ width: '100%' }}>
       {width > 0 && (
-        <div
-          className="relative"
-          style={{ height: totalHeight, overflow: 'hidden' }}
-        >
-          {Array.from(widgets.entries()).map(([id, pos]) => renderWidget(id, pos))}
+        <div className="relative" style={{ height: totalHeight, overflow: 'hidden' }}>
+          {Array.from(widgets.entries()).map(([id, pos]) => {
+            const isDragging = draggingWidget === id
+            const isResizing = resizingWidget === id
+            return (
+              <div
+                key={id}
+                data-widget-id={id}
+                onPointerDown={(e) => handlePointerDown(e, id)}
+                onPointerMove={handlePointerMove}
+                className="absolute"
+                style={{
+                  left: pos.x,
+                  top: pos.y,
+                  width: pos.width,
+                  height: pos.height,
+                  cursor: cursors[id] ?? 'move',
+                  zIndex: isDragging || isResizing ? 100 : 1,
+                  userSelect: 'none',
+                  touchAction: 'none',
+                  transition: isDragging || isResizing ? 'none' : 'box-shadow 0.15s',
+                  boxShadow: isDragging || isResizing ? '0 8px 32px rgba(0,0,0,0.5)' : 'none',
+                }}
+              >
+                {React.Children.map(children, (child) => {
+                  if (React.isValidElement(child) && String(child.key) === id) {
+                    return child
+                  }
+                  return null
+                })}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
