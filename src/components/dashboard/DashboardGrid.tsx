@@ -40,11 +40,12 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete, swit
   )
 
   return (
-    <GridWrapper
+      <GridWrapper
       layouts={displayLayouts}
       onLayoutChange={handleLayoutChange}
       rowHeight={HUB_GRID.rowHeight}
       margin={[...HUB_GRID.margin]}
+      persistenceKey="adversity-hub-pixels-v1"
       draggableHandle=".widget-drag-bar"
     >
       {visibleWidgetIds.map(id => {

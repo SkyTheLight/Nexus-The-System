@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from "react"
+import React, { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from "react"
 
 export interface WidgetPixelPos {
   x: number; y: number; w: number; h: number

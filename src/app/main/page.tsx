@@ -63,7 +63,7 @@ export default function MainPage() {
   return (
     <div className="min-h-screen bg-[#06060a] font-mono">
       <TopNav />
-      <GridWrapper layouts={layouts} onLayoutChange={handleLayoutChange} draggableHandle=".widget-drag-bar">
+      <GridWrapper layouts={layouts} onLayoutChange={handleLayoutChange} persistenceKey="adversity-main-pixels-v1" draggableHandle=".widget-drag-bar">
         {currentLayout.map(item => {
           const Component = widgetMap[item.i]
           if (!Component) return null
