@@ -257,11 +257,6 @@ html, body {
 
 .widget-drag-bar:active { cursor: grabbing; }
 
-.hud-grid-item .widget-drag-bar {
-  margin: -16px -16px 0;
-  padding: 10px 16px 6px;
-}
-
 .hud-grid-item-body {
   flex: 1;
   min-height: 0;
