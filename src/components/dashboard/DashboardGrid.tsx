@@ -2,14 +2,16 @@
 
 import { useMemo } from 'react'
 import { GridWrapper } from '@/components/shared/GridWrapper'
-import { useGridLayout } from '@/hooks/useGridLayout'
 import WidgetShell from './WidgetShell'
 import { WIDGET_REGISTRY } from '@/lib/widgetRegistry'
-import { HUB_DEFAULT_LAYOUTS, HUB_GRID, layoutsForVisible } from '@/lib/layout'
+import { HUB_GRID, layoutsForVisible } from '@/lib/layout'
+import type { Layout, Layouts } from 'react-grid-layout'
 import { Check } from 'lucide-react'
 
 interface DashboardGridProps {
   visibleWidgetIds: string[]
+  displayLayouts: Layouts
+  onLayoutChange: (currentLayout: Layout[], allLayouts: Layouts) => void
   onHide:   (id: string) => void
   onDelete: (id: string) => void
   switchMode?: boolean
@@ -17,36 +19,22 @@ interface DashboardGridProps {
   onWidgetClick?: (id: string) => void
 }
 
-export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete, switchMode, selectedId, onWidgetClick }: DashboardGridProps) {
-  const { layouts, handleLayoutChange, loaded } = useGridLayout({
-    page: 'hub',
-    defaultLayouts: HUB_DEFAULT_LAYOUTS,
-  })
-
+export default function DashboardGrid({
+  visibleWidgetIds, displayLayouts, onLayoutChange,
+  onHide, onDelete, switchMode, selectedId, onWidgetClick,
+}: DashboardGridProps) {
   const registryById = useMemo(
     () => new Map(WIDGET_REGISTRY.map(w => [w.id, w])),
     []
   )
 
-  const displayLayouts = useMemo(
-    () => layoutsForVisible(layouts, visibleWidgetIds),
-    [layouts, visibleWidgetIds]
-  )
-
-  if (!loaded) return (
-    <div className="text-[var(--color-text-muted)] text-xs py-8 text-center font-mono uppercase tracking-widest">
-      Loading grid...
-    </div>
-  )
-
   return (
-      <GridWrapper
+    <GridWrapper
       layouts={displayLayouts}
-      onLayoutChange={handleLayoutChange}
+      onLayoutChange={onLayoutChange}
       rowHeight={HUB_GRID.rowHeight}
       margin={[...HUB_GRID.margin]}
       persistenceKey="adversity-hub-pixels-v1"
-      draggableHandle=".widget-drag-bar"
     >
       {visibleWidgetIds.map(id => {
         const entry = registryById.get(id)
@@ -67,7 +55,6 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete, swit
                 </div>
               )}
               <WidgetShell
-                id={id}
                 label={entry.label}
                 onHide={() => onHide(id)}
                 onDelete={() => onDelete(id)}

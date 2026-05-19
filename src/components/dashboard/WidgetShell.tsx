@@ -1,10 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { GripVertical, EyeOff, Trash2, X, Check } from 'lucide-react'
 
 interface WidgetShellProps {
-  id: string
   label: string
   onHide: () => void
   onDelete: () => void
@@ -23,41 +21,34 @@ export default function WidgetShell({ label, onHide, onDelete, children }: Widge
     >
       <div className="sl-scan" />
 
-      {/* Drag bar */}
-      <div className="widget-drag-bar flex items-center justify-between px-3 py-2 shrink-0 cursor-grab active:cursor-grabbing">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="p-0.5 rounded hover:bg-[var(--sl-gold-dim)] transition-colors shrink-0">
-            <GripVertical size={13} className="text-[var(--sl-gold)]" style={{ animation: hovered ? 'sl-mana-pulse 2s ease-in-out infinite' : 'none' }} />
-          </div>
-          <span className="text-[11px] font-['Cinzel'] font-semibold text-[var(--sl-gold)] uppercase tracking-wider truncate">
-            {label}
-          </span>
-        </div>
-
-        <div className={`flex items-center gap-0.5 transition-opacity duration-150 ${hovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-          <button onClick={onHide} className="p-1 rounded hover:bg-[var(--sl-gold-dim)] transition-colors" title="Hide">
-            <EyeOff size={11} className="text-[var(--sl-text-muted)]" />
+      <div className="widget-drag-bar flex items-center gap-2 px-4 py-1.5 border-b border-[rgba(215,179,106,0.12)] shrink-0">
+        <div className="w-1.5 h-1.5 rounded-full bg-[var(--sl-gold)]/40" />
+        <span className="text-[clamp(9px,1.5cqw,12px)] font-mono text-[var(--sl-text-muted)] uppercase tracking-[0.2em]">{label}</span>
+        <div className="ml-auto flex items-center gap-0.5">
+          <button
+            onClick={onHide}
+            className={`text-[9px] font-mono text-[var(--sl-text-dim)] hover:text-[var(--sl-gold)] transition-colors uppercase tracking-[0.15em] ${hovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          >
+            HIDE
           </button>
           {confirmDelete ? (
             <div className="flex items-center gap-0.5">
-              <span className="text-[9px] text-[var(--sl-text-muted)] whitespace-nowrap">Remove?</span>
-              <button onClick={onDelete} className="p-1 rounded hover:bg-[var(--sl-alert-dim)] transition-colors">
-                <Check size={11} className="text-[var(--sl-alert)]" />
-              </button>
-              <button onClick={() => setConfirmDelete(false)} className="p-1 rounded hover:bg-[var(--sl-gold-dim)] transition-colors">
-                <X size={11} className="text-[var(--sl-text-muted)]" />
-              </button>
+              <span className="text-[9px] text-[var(--sl-text-dim)]">DEL?</span>
+              <button onClick={onDelete} className="text-[9px] font-mono text-[var(--sl-alert)] hover:text-[var(--sl-alert-dim)] transition-colors">[OK]</button>
+              <button onClick={() => setConfirmDelete(false)} className="text-[9px] font-mono text-[var(--sl-text-dim)] hover:text-[var(--sl-gold)] transition-colors">[X]</button>
             </div>
           ) : (
-            <button onClick={() => setConfirmDelete(true)} className="p-1 rounded hover:bg-[var(--sl-alert-dim)] transition-colors" title="Delete">
-              <Trash2 size={11} className="text-[var(--sl-text-muted)]" />
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className={`text-[9px] font-mono text-[var(--sl-text-dim)] hover:text-[var(--sl-alert)] transition-colors uppercase tracking-[0.15em] ${hovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            >
+              DEL
             </button>
           )}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="widget-no-drag flex-1 overflow-y-auto p-3">
+      <div className="widget-no-drag flex-1 p-4 overflow-auto">
         {children}
       </div>
     </div>

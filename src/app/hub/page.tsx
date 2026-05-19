@@ -10,7 +10,7 @@ import ManageWidgetsPanel from '@/components/dashboard/ManageWidgetsPanel'
 import WidgetPicker from '@/components/dashboard/WidgetPicker'
 import { WIDGET_REGISTRY } from '@/lib/widgetRegistry'
 import { useGridLayout } from '@/hooks/useGridLayout'
-import { HUB_DEFAULT_LAYOUTS } from '@/lib/layout'
+import { HUB_DEFAULT_LAYOUTS, layoutsForVisible } from '@/lib/layout'
 import { Settings, Plus, Check } from 'lucide-react'
 
 const HIDDEN_KEY  = 'adversity-hub-hidden'
@@ -61,6 +61,11 @@ export default function HubPage() {
     defaultLayouts: HUB_DEFAULT_LAYOUTS,
     widgetIds: visibleWidgetIds,
   })
+
+  const displayLayouts = useMemo(
+    () => layoutsForVisible(layouts, visibleWidgetIds),
+    [layouts, visibleWidgetIds]
+  )
 
   if (!initialized) return (
     <div className="flex h-screen overflow-hidden">
@@ -128,6 +133,8 @@ export default function HubPage() {
               )}
               <DashboardGrid
                 visibleWidgetIds={visibleWidgetIds}
+                displayLayouts={displayLayouts}
+                onLayoutChange={handleLayoutChange}
                 onHide={hideWidget}
                 onDelete={deleteWidget}
                 switchMode={switchMode}
