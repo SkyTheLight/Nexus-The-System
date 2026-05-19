@@ -74,6 +74,7 @@ const handles = [
 export function GridWrapper({
   layouts,
   onLayoutChange,
+  adjustable = false,
   children,
   rowHeight = 72,
   margin = [12, 12] as [number, number],
@@ -81,6 +82,7 @@ export function GridWrapper({
 }: {
   layouts: Layouts
   onLayoutChange?: (currentLayout: Layout[], allLayouts: Layouts) => void
+  adjustable?: boolean
   children: React.ReactNode
   rowHeight?: number
   margin?: [number, number]
@@ -151,10 +153,9 @@ export function GridWrapper({
 
   /* ── Drag / Resize with grid snapping ── */
   const onDown = useCallback((e: React.MouseEvent, id: string) => {
+    if (!adjustable || !onLayoutChange) return
     e.preventDefault()
     e.stopPropagation()
-
-    if (!onLayoutChange) return
 
     const start = wRef.current.get(id)
     if (!start) return
@@ -282,13 +283,13 @@ export function GridWrapper({
                 style={{
                   left: pos.x, top: pos.y,
                   width: pos.width, height: pos.height,
-                  cursor: 'move',
+                  cursor: adjustable ? 'move' : 'default',
                   zIndex: active ? 100 : 1,
                   userSelect: 'none', touchAction: 'none',
                 }}
               >
-                {/* Resize handles (visible on hover via opacity) */}
-                {handles.map(h => (
+                {/* Resize handles (visible only in adjustment mode on hover) */}
+                {adjustable && handles.map(h => (
                   <div
                     key={h.key}
                     className="resize-handle"
@@ -317,6 +318,11 @@ export function GridWrapper({
       <style>{`
         .absolute:hover > .resize-handle { opacity: 1 !important; }
       `}</style>
+      {adjustable && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-3 py-1.5 bg-[#a855f7] text-[10px] font-mono text-black font-bold rounded pointer-events-none uppercase tracking-wider">
+          ADJUSTMENT MODE
+        </div>
+      )}
     </div>
   )
 }

@@ -12,6 +12,7 @@ interface DashboardGridProps {
   visibleWidgetIds: string[]
   displayLayouts: Layouts
   onLayoutChange: (currentLayout: Layout[], allLayouts: Layouts) => void
+  adjustable?: boolean
   onHide:   (id: string) => void
   onDelete: (id: string) => void
   switchMode?: boolean
@@ -21,7 +22,7 @@ interface DashboardGridProps {
 
 export default function DashboardGrid({
   visibleWidgetIds, displayLayouts, onLayoutChange,
-  onHide, onDelete, switchMode, selectedId, onWidgetClick,
+  adjustable, onHide, onDelete, switchMode, selectedId, onWidgetClick,
 }: DashboardGridProps) {
   const registryById = useMemo(
     () => new Map(WIDGET_REGISTRY.map(w => [w.id, w])),
@@ -32,6 +33,7 @@ export default function DashboardGrid({
     <GridWrapper
       layouts={displayLayouts}
       onLayoutChange={onLayoutChange}
+      adjustable={adjustable}
       rowHeight={HUB_GRID.rowHeight}
       margin={[...HUB_GRID.margin]}
       persistenceKey="adversity-hub-pixels-v1"

@@ -11,7 +11,7 @@ import WidgetPicker from '@/components/dashboard/WidgetPicker'
 import { WIDGET_REGISTRY } from '@/lib/widgetRegistry'
 import { useGridLayout } from '@/hooks/useGridLayout'
 import { HUB_DEFAULT_LAYOUTS, layoutsForVisible } from '@/lib/layout'
-import { Settings, Plus, Check } from 'lucide-react'
+import { Settings, Plus, Check, Move } from 'lucide-react'
 
 const HIDDEN_KEY  = 'adversity-hub-hidden'
 const DELETED_KEY = 'adversity-hub-deleted'
@@ -31,6 +31,7 @@ export default function HubPage() {
   const [deletedSet,  setDeletedSet]  = useState<Set<string>>(new Set())
   const [manageOpen,  setManageOpen]  = useState(false)
   const [pickerOpen,  setPickerOpen]  = useState(false)
+  const [adjustmentMode, setAdjustmentMode] = useState(false)
 
   useEffect(() => {
     setHiddenSet(loadSet(HIDDEN_KEY))
@@ -91,7 +92,17 @@ export default function HubPage() {
             <p className="text-xs text-[var(--color-text-muted)]">Your personal command center</p>
           </div>
           <div className="flex items-center gap-2">
-            {!switchMode && (
+            <button
+              onClick={() => setAdjustmentMode(!adjustmentMode)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors text-xs ${
+                adjustmentMode
+                  ? 'bg-[#a855f7] text-black border-[#a855f7] font-bold'
+                  : 'bg-white/5 hover:bg-white/10 border-[var(--color-border)] text-[var(--color-text-muted)]'
+              }`}
+            >
+              <Move size={14} /> {adjustmentMode ? 'DONE' : 'ARRANGE'}
+            </button>
+            {!switchMode && !adjustmentMode && (
               <>
                 <button onClick={() => setPickerOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-[var(--color-border)] transition-colors text-xs text-[var(--color-text-muted)]">
                   <Plus size={14} /> Add
@@ -127,7 +138,8 @@ export default function HubPage() {
               <DashboardGrid
                 visibleWidgetIds={visibleWidgetIds}
                 displayLayouts={displayLayouts}
-                onLayoutChange={handleLayoutChange}
+                onLayoutChange={adjustmentMode ? handleLayoutChange : undefined}
+                adjustable={adjustmentMode}
                 onHide={hideWidget}
                 onDelete={deleteWidget}
                 switchMode={switchMode}

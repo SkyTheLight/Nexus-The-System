@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary'
 import { GridWrapper } from '@/components/shared/GridWrapper'
 import { useGridLayout } from '@/hooks/useGridLayout'
@@ -12,7 +13,7 @@ import PinnedWidget from '@/app/main/components/PinnedWidget'
 import ClassesWidget from '@/app/main/components/ClassesWidget'
 import PHNewsWidget from '@/app/main/components/PHNewsWidget'
 import { MAIN_DEFAULT_LAYOUTS } from '@/lib/layout'
-import { Check } from 'lucide-react'
+import { Check, Move } from 'lucide-react'
 
 const WIDGET_IDS = ['greeting', 'holiday', 'motivation', 'tasks', 'pinned', 'classes', 'ph-news']
 
@@ -45,6 +46,7 @@ export default function MainPage() {
 }
 
 function MainPageInner() {
+  const [adjustmentMode, setAdjustmentMode] = useState(false)
   const {
     layouts, handleLayoutChange, loaded,
     switchMode, selectedId, handleWidgetClick,
@@ -59,6 +61,18 @@ function MainPageInner() {
   return (
     <div className="min-h-screen bg-[#06060a] font-mono">
       <TopNav />
+      <div className="flex items-center justify-end px-6 py-2">
+        <button
+          onClick={() => setAdjustmentMode(!adjustmentMode)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors text-xs ${
+            adjustmentMode
+              ? 'bg-[#a855f7] text-black border-[#a855f7] font-bold'
+              : 'bg-white/5 hover:bg-white/10 border-[var(--color-border)] text-[var(--color-text-muted)]'
+          }`}
+        >
+          <Move size={14} /> {adjustmentMode ? 'DONE' : 'ARRANGE'}
+        </button>
+      </div>
       {!loaded ? (
         <div className="flex items-center justify-center h-[calc(100vh-40px)]">
           <div className="text-[var(--sl-gold)] text-xs tracking-widest uppercase animate-pulse">
@@ -67,7 +81,12 @@ function MainPageInner() {
         </div>
       ) : (
         <>
-          <GridWrapper layouts={layouts} onLayoutChange={handleLayoutChange} persistenceKey="adversity-main-pixels-v1">
+          <GridWrapper
+            layouts={layouts}
+            onLayoutChange={adjustmentMode ? handleLayoutChange : undefined}
+            adjustable={adjustmentMode}
+            persistenceKey="adversity-main-pixels-v1"
+          >
             {currentLayout.map(item => {
               const Component = widgetMap[item.i]
               if (!Component) return null
