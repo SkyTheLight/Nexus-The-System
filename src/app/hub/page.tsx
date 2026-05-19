@@ -8,7 +8,6 @@ import LiquidBackground from '@/components/LiquidBackground'
 import DashboardGrid from '@/components/dashboard/DashboardGrid'
 import ManageWidgetsPanel from '@/components/dashboard/ManageWidgetsPanel'
 import WidgetPicker from '@/components/dashboard/WidgetPicker'
-import GridControlPanel from '@/components/shared/GridControlPanel'
 import { WIDGET_REGISTRY } from '@/lib/widgetRegistry'
 import { useGridLayout } from '@/hooks/useGridLayout'
 import { HUB_DEFAULT_LAYOUTS } from '@/lib/layout'
@@ -56,9 +55,7 @@ export default function HubPage() {
 
   const {
     layouts, handleLayoutChange, loaded,
-    switchMode, setSwitchMode, selectedId, handleWidgetClick,
-    resetLayout, shuffleLayout, applyPreset, resizeWidget,
-    gridOverlay, setGridOverlay,
+    switchMode, selectedId, handleWidgetClick,
   } = useGridLayout({
     page: 'hub',
     defaultLayouts: HUB_DEFAULT_LAYOUTS,
@@ -141,19 +138,6 @@ export default function HubPage() {
           )}
         </div>
       </main>
-
-      {/* Control panel */}
-      <GridControlPanel
-        switchMode={switchMode}
-        onToggleSwitch={() => { setSwitchMode(!switchMode); setSelectedId(null) }}
-        onReset={resetLayout}
-        onShuffle={shuffleLayout}
-        onPreset={applyPreset}
-        gridOverlay={gridOverlay}
-        onToggleOverlay={() => setGridOverlay(!gridOverlay)}
-        selectedId={selectedId}
-        onWidgetSize={resizeWidget}
-      />
 
       <ManageWidgetsPanel
         open={manageOpen}

@@ -2,7 +2,6 @@
 
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary'
 import { GridWrapper } from '@/components/shared/GridWrapper'
-import GridControlPanel from '@/components/shared/GridControlPanel'
 import { useGridLayout } from '@/hooks/useGridLayout'
 import TopNav from '@/components/TopNav'
 import GreetingWidget from '@/app/main/components/GreetingWidget'
@@ -48,9 +47,7 @@ export default function MainPage() {
 function MainPageInner() {
   const {
     layouts, handleLayoutChange, loaded,
-    switchMode, setSwitchMode, selectedId, handleWidgetClick,
-    resetLayout, shuffleLayout, applyPreset, resizeWidget,
-    gridOverlay, setGridOverlay,
+    switchMode, selectedId, handleWidgetClick,
   } = useGridLayout({
     page: 'main',
     defaultLayouts: MAIN_DEFAULT_LAYOUTS,
@@ -100,35 +97,6 @@ function MainPageInner() {
               )
             })}
           </GridWrapper>
-
-          {/* Grid overlay */}
-          {gridOverlay && (
-            <div className="fixed inset-0 z-0 pointer-events-none" style={{
-              backgroundImage: 'linear-gradient(rgba(215,179,106,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(215,179,106,0.04) 1px, transparent 1px)',
-              backgroundSize: `${100 / 12}vw, 72px`,
-              marginTop: '40px',
-            }} />
-          )}
-
-          {/* Control panel */}
-          <GridControlPanel
-            switchMode={switchMode}
-            onToggleSwitch={() => { setSwitchMode(!switchMode); setSelectedId(null) }}
-            onReset={resetLayout}
-            onShuffle={shuffleLayout}
-            onPreset={applyPreset}
-            gridOverlay={gridOverlay}
-            onToggleOverlay={() => setGridOverlay(!gridOverlay)}
-            selectedId={selectedId}
-            onWidgetSize={resizeWidget}
-          />
-
-          {/* Switch mode hint */}
-          {switchMode && selectedId && (
-            <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-[var(--sl-gold)]/10 border border-[var(--sl-gold)]/30 rounded-lg text-[10px] font-mono text-[var(--sl-gold)] uppercase tracking-wider animate-[sl-fade-in_200ms_ease-out]">
-              Selected: {widgetLabels[selectedId]} — click another widget to swap
-            </div>
-          )}
         </>
       )}
     </div>
