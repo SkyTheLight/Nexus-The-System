@@ -1,5 +1,6 @@
 'use client'
 
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary'
 import { GridWrapper } from '@/components/shared/GridWrapper'
 import GridControlPanel from '@/components/shared/GridControlPanel'
 import { useGridLayout } from '@/hooks/useGridLayout'
@@ -37,6 +38,14 @@ const widgetLabels: Record<string, string> = {
 }
 
 export default function MainPage() {
+  return (
+    <PageErrorBoundary>
+      <MainPageInner />
+    </PageErrorBoundary>
+  )
+}
+
+function MainPageInner() {
   const {
     layouts, handleLayoutChange, loaded,
     switchMode, setSwitchMode, selectedId, handleWidgetClick,
