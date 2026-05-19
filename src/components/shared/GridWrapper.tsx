@@ -13,8 +13,6 @@ interface GridWrapperProps {
   children: React.ReactNode
   rowHeight?: number
   margin?: [number, number]
-  draggableHandle?: string
-  onBreakpointChange?: (bp: string, cols: number) => void
   persistenceKey?: string
 }
 
@@ -27,10 +25,7 @@ const DEFAULT_MARGIN = 12
 function loadPixelPositions(key: string): Map<string, LayoutPosition> | null {
   try {
     const raw = localStorage.getItem(key)
-    if (raw) {
-      const obj = JSON.parse(raw) as Record<string, LayoutPosition>
-      return new Map(Object.entries(obj))
-    }
+    if (raw) return new Map(Object.entries(JSON.parse(raw) as Record<string, LayoutPosition>))
   } catch {}
   return null
 }
@@ -43,14 +38,14 @@ function savePixelPositions(key: string, m: Map<string, LayoutPosition>) {
   } catch {}
 }
 
-function pixelsToGrid(id: string, pos: LayoutPosition, containerWidth: number, cols: number, rowHeight: number, margin: number): Layout {
-  const colWidth = (containerWidth - margin * (cols - 1)) / cols
+function pixelsToGrid(id: string, pos: LayoutPosition, w: number, rh: number, mg: number): Layout {
+  const cw = (w - mg * (COLS - 1)) / COLS
   return [{
     i: id,
-    x: Math.max(0, Math.round(pos.x / (colWidth + margin))),
-    y: Math.max(0, Math.round(pos.y / (rowHeight + margin))),
-    w: Math.max(1, Math.min(cols, Math.round((pos.width + margin) / (colWidth + margin)))),
-    h: Math.max(1, Math.round((pos.height + margin) / (rowHeight + margin))),
+    x: Math.max(0, Math.round(pos.x / (cw + mg))),
+    y: Math.max(0, Math.round(pos.y / (rh + mg))),
+    w: Math.max(1, Math.min(COLS, Math.round((pos.width + mg) / (cw + mg)))),
+    h: Math.max(1, Math.round((pos.height + mg) / (rh + mg))),
   }]
 }
 
@@ -63,15 +58,13 @@ export function GridWrapper({
   persistenceKey = "adversity-grid-pixels-v1",
 }: GridWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const widgetsRef = useRef<Map<string, LayoutPosition>>(new Map())
   const [mounted, setMounted] = useState(false)
   const [width, setWidth] = useState(0)
   const [widgets, setWidgets] = useState<Map<string, LayoutPosition>>(new Map())
-  const [activeWidget, setActiveWidget] = useState<string | null>(null)
-  const cursorsRef = useRef<Record<string, string>>({})
-  const [_, forceRender] = useState(0)
-
-  const rerender = useCallback(() => forceRender(n => n + 1), [])
+  const [dragging, setDragging] = useState<string | null>(null)
+  const [resizing, setResizing] = useState<string | null>(null)
+  const widgetsRef = useRef(widgets)
+  widgetsRef.current = widgets
 
   const measure = useCallback(() => {
     const w = containerRef.current?.getBoundingClientRect().width ?? 0
@@ -89,243 +82,102 @@ export function GridWrapper({
     return () => { clearTimeout(t1); clearTimeout(t2); ro.disconnect(); window.removeEventListener("resize", measure) }
   }, [measure])
 
-  /* Save on page unload */
   useEffect(() => {
     const flush = () => savePixelPositions(persistenceKey, widgetsRef.current)
     window.addEventListener("beforeunload", flush)
     return () => window.removeEventListener("beforeunload", flush)
   }, [persistenceKey])
 
-  /* Initialize / merge widget positions */
   useEffect(() => {
     if (!mounted || width === 0) return
     const saved = loadPixelPositions(persistenceKey)
     const lg = layouts.lg ?? []
     const merged = new Map<string, LayoutPosition>()
-
+    const cw = (width - margin[0] * (COLS - 1)) / COLS
     for (const item of lg) {
-      const savedPos = saved?.get(item.i)
-      if (savedPos) {
-        merged.set(item.i, savedPos)
-      } else {
-        const colWidth = (width - margin[0] * (COLS - 1)) / COLS
-        merged.set(item.i, {
-          x: item.x * (colWidth + margin[0]),
-          y: item.y * (rowHeight + margin[0]),
-          width: item.w * colWidth + (item.w - 1) * margin[0],
-          height: item.h * rowHeight + (item.h - 1) * margin[0],
-        })
-      }
+      const p = saved?.get(item.i)
+      merged.set(item.i, p ?? {
+        x: item.x * (cw + margin[0]),
+        y: item.y * (rowHeight + margin[0]),
+        width: item.w * cw + (item.w - 1) * margin[0],
+        height: item.h * rowHeight + (item.h - 1) * margin[0],
+      })
     }
-    widgetsRef.current = merged
     setWidgets(merged)
   }, [mounted, width, layouts, persistenceKey, rowHeight, margin])
 
-  /* ── Native drag interaction ── */
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+  const handleMouseDown = (e: React.MouseEvent, id: string) => {
+    e.preventDefault()
+    e.stopPropagation()
 
-    let dragId: string | null = null
-    let dragStartX = 0
-    let dragStartY = 0
-    let dragStartPos: LayoutPosition | null = null
-    let dragIsResize = false
-    let dragNR = false
-    let dragNB = false
-    let dragNL = false
-    let dragNT = false
+    const el = e.currentTarget as HTMLElement
+    const startPos = widgetsRef.current.get(id)
+    if (!startPos) return
 
-    const onPointerDown = (e: PointerEvent) => {
-      const el = (e.currentTarget as HTMLElement)
-      const wid = el.dataset.widgetId
-      if (!wid) return
+    const rect = el.getBoundingClientRect()
+    const rx = e.clientX - rect.left
+    const ry = e.clientY - rect.top
+    const nr = rx > rect.width - EDGE_THRESHOLD
+    const nb = ry > rect.height - EDGE_THRESHOLD
+    const nl = rx < EDGE_THRESHOLD
+    const nt = ry < EDGE_THRESHOLD
+    const isResize = nr || nb || nl || nt
 
-      const pos = widgetsRef.current.get(wid)
-      if (!pos) return
+    const startX = e.clientX
+    const startY = e.clientY
 
-      const rect = el.getBoundingClientRect()
-      const rx = e.clientX - rect.left
-      const ry = e.clientY - rect.top
+    const onMove = (me: MouseEvent) => {
+      const dx = me.clientX - startX
+      const dy = me.clientY - startY
 
-      const nr = rx > rect.width - EDGE_THRESHOLD
-      const nb = ry > rect.height - EDGE_THRESHOLD
-      const nl = rx < EDGE_THRESHOLD
-      const nt = ry < EDGE_THRESHOLD
-      const resize = nr || nb || nl || nt
-
-      if (!resize) el.setPointerCapture(e.pointerId)
-      e.preventDefault()
-
-      dragId = wid
-      dragStartX = e.clientX
-      dragStartY = e.clientY
-      dragStartPos = { ...pos }
-      dragIsResize = resize
-      dragNR = nr
-      dragNB = nb
-      dragNL = nl
-      dragNT = nt
-
-      el.style.zIndex = '100'
-      el.style.boxShadow = '0 8px 32px rgba(0,0,0,0.5)'
-      el.style.transition = 'none'
-      setActiveWidget(wid)
-    }
-
-    const onPointerMove = (e: PointerEvent) => {
-      if (!dragId || !dragStartPos) return
-
-      const dx = e.clientX - dragStartX
-      const dy = e.clientY - dragStartY
-
-      const el = container.querySelector(`[data-widget-id="${dragId}"]`) as HTMLElement | null
-      if (!el) return
-
-      if (!dragIsResize) {
-        el.style.left = `${Math.max(0, dragStartPos.x + dx)}px`
-        el.style.top = `${Math.max(0, dragStartPos.y + dy)}px`
+      if (!isResize) {
+        setDragging(id)
+        setWidgets(prev => {
+          const cur = prev.get(id)
+          if (!cur) return prev
+          const next = new Map(prev)
+          next.set(id, { ...cur, x: Math.max(0, startPos.x + dx), y: Math.max(0, startPos.y + dy) })
+          return next
+        })
       } else {
-        let nx = dragStartPos.x
-        let ny = dragStartPos.y
-        let nw = dragStartPos.width
-        let nh = dragStartPos.height
-
-        if (dragNR) nw = Math.max(MIN_SIZE, dragStartPos.width + dx)
-        if (dragNB) nh = Math.max(MIN_SIZE, dragStartPos.height + dy)
-        if (dragNL) {
-          const dw = -dx
-          if (dragStartPos.width + dw >= MIN_SIZE) {
-            nw = dragStartPos.width + dw
-            nx = dragStartPos.x - dw
-          }
-        }
-        if (dragNT) {
-          const dh = -dy
-          if (dragStartPos.height + dh >= MIN_SIZE) {
-            nh = dragStartPos.height + dh
-            ny = dragStartPos.y - dh
-          }
-        }
-
-        el.style.left = `${Math.max(0, nx)}px`
-        el.style.top = `${Math.max(0, ny)}px`
-        el.style.width = `${nw}px`
-        el.style.height = `${nh}px`
+        setResizing(id)
+        setWidgets(prev => {
+          const cur = prev.get(id)
+          if (!cur) return prev
+          let nx = startPos.x, ny = startPos.y, nw = startPos.width, nh = startPos.height
+          if (nr) nw = Math.max(MIN_SIZE, startPos.width + dx)
+          if (nb) nh = Math.max(MIN_SIZE, startPos.height + dy)
+          if (nl) { const dw = -dx; if (startPos.width + dw >= MIN_SIZE) { nw = startPos.width + dw; nx = startPos.x - dw } }
+          if (nt) { const dh = -dy; if (startPos.height + dh >= MIN_SIZE) { nh = startPos.height + dh; ny = startPos.y - dh } }
+          const next = new Map(prev)
+          next.set(id, { x: Math.max(0, nx), y: Math.max(0, ny), width: nw, height: nh })
+          return next
+        })
       }
     }
 
-    const onPointerUp = (e: PointerEvent) => {
-      if (!dragId || !dragStartPos) {
-        dragId = null
-        return
-      }
+    const onUp = () => {
+      document.removeEventListener("mousemove", onMove)
+      document.removeEventListener("mouseup", onUp)
+      setDragging(null)
+      setResizing(null)
 
-      const el = container.querySelector(`[data-widget-id="${dragId}"]`) as HTMLElement | null
-
-      /* Read final position from DOM */
-      let finalLeft = dragStartPos.x
-      let finalTop = dragStartPos.y
-      let finalWidth = dragStartPos.width
-      let finalHeight = dragStartPos.height
-
-      if (el) {
-        const leftStr = el.style.left
-        const topStr = el.style.top
-        const widthStr = el.style.width
-        const heightStr = el.style.height
-        if (leftStr) finalLeft = parseFloat(leftStr)
-        if (topStr) finalTop = parseFloat(topStr)
-        if (widthStr) finalWidth = parseFloat(widthStr)
-        if (heightStr) finalHeight = parseFloat(heightStr)
-
-        el.style.zIndex = '1'
-        el.style.boxShadow = 'none'
-        el.style.transition = 'box-shadow 0.15s'
-
-        /* Release pointer capture if any */
-        try { el.releasePointerCapture(e.pointerId) } catch {}
-      }
-
-      const finalPos: LayoutPosition = {
-        x: finalLeft,
-        y: finalTop,
-        width: finalWidth,
-        height: finalHeight,
-      }
-
-      /* Update React state */
-      widgetsRef.current.set(dragId, finalPos)
-      setWidgets(new Map(widgetsRef.current))
-      setActiveWidget(null)
-
-      /* Persist */
       savePixelPositions(persistenceKey, widgetsRef.current)
 
-      /* Notify parent */
-      const w = width
-      if (w > 0) {
-        const gi = pixelsToGrid(dragId, finalPos, w, COLS, rowHeight, margin[0])[0]
+      const final = widgetsRef.current.get(id)
+      if (final && width > 0) {
+        const gi = pixelsToGrid(id, final, width, rowHeight, margin[0])[0]
         const lg = layouts.lg ?? []
-        const newLg = lg.map(item =>
-          item.i === dragId
-            ? { ...item, x: gi.x, y: gi.y, w: gi.w, h: gi.h }
-            : item
+        onLayoutChange(
+          lg.map(item => item.i === id ? { ...item, x: gi.x, y: gi.y, w: gi.w, h: gi.h } : item),
+          { ...layouts, lg: lg.map(item => item.i === id ? { ...item, x: gi.x, y: gi.y, w: gi.w, h: gi.h } : item) }
         )
-        onLayoutChange(newLg, { ...layouts, lg: newLg })
       }
-
-      dragId = null
-      dragStartPos = null
     }
 
-    /* Cursor tracking */
-    const onPointerMoveCursor = (e: PointerEvent) => {
-      const el = (e.currentTarget as HTMLElement)
-      const wid = el.dataset.widgetId
-      if (!wid) return
-      if (dragId) return
-
-      const rect = el.getBoundingClientRect()
-      const rx = e.clientX - rect.left
-      const ry = e.clientY - rect.top
-
-      const nl = rx < EDGE_THRESHOLD
-      const nr = rx > rect.width - EDGE_THRESHOLD
-      const nt = ry < EDGE_THRESHOLD
-      const nb = ry > rect.height - EDGE_THRESHOLD
-
-      let cursor = 'move'
-      if ((nl && nt) || (nr && nb)) cursor = 'nwse-resize'
-      else if ((nr && nt) || (nl && nb)) cursor = 'nesw-resize'
-      else if (nr || nl) cursor = 'ew-resize'
-      else if (nt || nb) cursor = 'ns-resize'
-
-      if (el.style.cursor !== cursor) el.style.cursor = cursor
-    }
-
-    /* Attach native pointerdown to each widget */
-    const widgets = container.querySelectorAll<HTMLElement>('[data-widget-id]')
-    widgets.forEach(el => {
-      el.addEventListener('pointerdown', onPointerDown)
-      el.addEventListener('pointermove', onPointerMoveCursor)
-    })
-
-    /* Document-level move/up */
-    document.addEventListener('pointermove', onPointerMove)
-    document.addEventListener('pointerup', onPointerUp)
-
-    return () => {
-      widgets.forEach(el => {
-        el.removeEventListener('pointerdown', onPointerDown)
-        el.removeEventListener('pointermove', onPointerMoveCursor)
-      })
-      document.removeEventListener('pointermove', onPointerMove)
-      document.removeEventListener('pointerup', onPointerUp)
-    }
-  })
-
-  /* ── Render ── */
+    document.addEventListener("mousemove", onMove)
+    document.addEventListener("mouseup", onUp)
+  }
 
   if (!mounted) return <div ref={containerRef} style={{ width: '100%', minHeight: 400 }} />
 
@@ -338,27 +190,21 @@ export function GridWrapper({
       {width > 0 && (
         <div className="relative" style={{ height: totalHeight, overflow: 'hidden' }}>
           {Array.from(widgets.entries()).map(([id, pos]) => {
-            const isActive = activeWidget === id
+            const isDrag = dragging === id
+            const isResize = resizing === id
             return (
               <div
                 key={id}
-                data-widget-id={id}
+                onMouseDown={(e) => handleMouseDown(e, id)}
                 className="absolute"
                 style={{
-                  left: pos.x,
-                  top: pos.y,
-                  width: pos.width,
-                  height: pos.height,
-                  cursor: 'move',
-                  zIndex: isActive ? 100 : 1,
-                  userSelect: 'none',
-                  touchAction: 'none',
+                  left: pos.x, top: pos.y, width: pos.width, height: pos.height,
+                  cursor: 'move', zIndex: isDrag || isResize ? 100 : 1,
+                  userSelect: 'none', touchAction: 'none',
                 }}
               >
                 {React.Children.map(children, (child) => {
-                  if (React.isValidElement(child) && String(child.key) === id) {
-                    return child
-                  }
+                  if (React.isValidElement(child) && String(child.key) === id) return child
                   return null
                 })}
               </div>
