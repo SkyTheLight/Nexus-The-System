@@ -149,10 +149,9 @@ export function GridWrapper({
     const startPos = widgets.get(widgetId)
     if (!startPos) return
 
-    const rect = (e.target as HTMLElement).getBoundingClientRect()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const relX = e.clientX - rect.left
     const relY = e.clientY - rect.top
-
     const isNearRight = relX > rect.width - EDGE_THRESHOLD
     const isNearBottom = relY > rect.height - EDGE_THRESHOLD
     const isNearLeft = relX < EDGE_THRESHOLD
