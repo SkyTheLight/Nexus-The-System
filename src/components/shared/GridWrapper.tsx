@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect, useCallback } from "react"
 import type { Layout, Layouts } from "react-grid-layout"
 
+const EDGE = 15
+const MIN = 100
 const COLS = 12
 
 function loadPos(key: string): Map<string, { x: number; y: number; width: number; height: number }> | null {
@@ -13,8 +15,38 @@ function loadPos(key: string): Map<string, { x: number; y: number; width: number
   return null
 }
 
+function savePos(key: string, m: Map<string, { x: number; y: number; width: number; height: number }>) {
+  try {
+    const obj: Record<string, { x: number; y: number; width: number; height: number }> = {}
+    m.forEach((p, id) => { obj[id] = p })
+    localStorage.setItem(key, JSON.stringify(obj))
+  } catch {}
+}
+
+function toGrid(id: string, p: { x: number; y: number; width: number; height: number }, w: number, rh: number, mg: number): Layout {
+  const cw = (w - mg * (COLS - 1)) / COLS
+  return {
+    i: id,
+    x: Math.max(0, Math.round(p.x / (cw + mg))),
+    y: Math.max(0, Math.round(p.y / (rh + mg))),
+    w: Math.max(1, Math.min(COLS, Math.round((p.width + mg) / (cw + mg)))),
+    h: Math.max(1, Math.round((p.height + mg) / (rh + mg))),
+  }
+}
+
+function posEqual(a: Map<string, { x: number; y: number; width: number; height: number }>, b: Map<string, { x: number; y: number; width: number; height: number }>): boolean {
+  if (a.size !== b.size) return false
+  for (const [id, pa] of a) {
+    const pb = b.get(id)
+    if (!pb) return false
+    if (pa.x !== pb.x || pa.y !== pb.y || pa.width !== pb.width || pa.height !== pb.height) return false
+  }
+  return true
+}
+
 export function GridWrapper({
   layouts,
+  onLayoutChange,
   children,
   rowHeight = 72,
   margin = [12, 12] as [number, number],
@@ -31,6 +63,13 @@ export function GridWrapper({
   const [mounted, setMounted] = useState(false)
   const [width, setWidth] = useState(0)
   const [widgets, setWidgets] = useState<Map<string, { x: number; y: number; width: number; height: number }>>(new Map())
+  const [actId, setActId] = useState<string | null>(null)
+  const wRef = useRef(widgets)
+  wRef.current = widgets
+
+  /* Stable layout key to prevent effect re-runs */
+  const prevKeyRef = useRef("")
+  const layoutKey = JSON.stringify(layouts.lg?.map(i => ({ i: i.i, x: i.x, y: i.y, w: i.w, h: i.h })))
 
   const measure = useCallback(() => {
     const w = containerRef.current?.getBoundingClientRect().width ?? 0
@@ -45,8 +84,22 @@ export function GridWrapper({
     return () => ro.disconnect()
   }, [measure])
 
+  const [flushReady, setFlushReady] = useState(false)
+  useEffect(() => { setFlushReady(true) }, [])
+
+  useEffect(() => {
+    if (!flushReady) return
+    const flush = () => savePos(persistenceKey, wRef.current)
+    window.addEventListener("beforeunload", flush)
+    return () => window.removeEventListener("beforeunload", flush)
+  }, [persistenceKey, flushReady])
+
+  /* Initialise / reconcile pixel positions from layout */
   useEffect(() => {
     if (!mounted || width === 0) return
+    if (layoutKey === prevKeyRef.current) return
+    prevKeyRef.current = layoutKey
+
     const saved = loadPos(persistenceKey)
     const lg = layouts.lg ?? []
     const merged = new Map<string, { x: number; y: number; width: number; height: number }>()
@@ -64,8 +117,84 @@ export function GridWrapper({
         })
       }
     }
-    setWidgets(merged)
-  }, [mounted, width, layouts, persistenceKey, rowHeight, margin])
+
+    if (!posEqual(merged, wRef.current)) {
+      setWidgets(merged)
+    }
+  }, [mounted, width, layoutKey, persistenceKey, rowHeight, margin])
+
+  /* ── Drag / Resize ── */
+  const onDown = useCallback((e: React.MouseEvent, id: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!onLayoutChange) return
+
+    const start = wRef.current.get(id)
+    if (!start) return
+
+    const el = e.currentTarget as HTMLElement
+    const rect = el.getBoundingClientRect()
+    const rx = e.clientX - rect.left
+    const ry = e.clientY - rect.top
+    const nr = rx > rect.width - EDGE
+    const nb = ry > rect.height - EDGE
+    const nl = rx < EDGE
+    const nt = ry < EDGE
+    const isResize = nr || nb || nl || nt
+
+    const sx = e.clientX
+    const sy = e.clientY
+
+    const onMove = (me: MouseEvent) => {
+      const dx = me.clientX - sx
+      const dy = me.clientY - sy
+      if (!isResize) {
+        setActId(id)
+        setWidgets(prev => {
+          const cur = prev.get(id)
+          if (!cur) return prev
+          const next = new Map(prev)
+          next.set(id, { ...cur, x: Math.max(0, start.x + dx), y: Math.max(0, start.y + dy) })
+          return next
+        })
+      } else {
+        setActId(id)
+        setWidgets(prev => {
+          const cur = prev.get(id)
+          if (!cur) return prev
+          let nx = start.x, ny = start.y, nw = start.width, nh = start.height
+          if (nr) nw = Math.max(MIN, start.width + dx)
+          if (nb) nh = Math.max(MIN, start.height + dy)
+          if (nl) { const dw = -dx; if (start.width + dw >= MIN) { nw = start.width + dw; nx = start.x - dw } }
+          if (nt) { const dh = -dy; if (start.height + dh >= MIN) { nh = start.height + dh; ny = start.y - dh } }
+          const next = new Map(prev)
+          next.set(id, { x: Math.max(0, nx), y: Math.max(0, ny), width: nw, height: nh })
+          return next
+        })
+      }
+    }
+
+    const onUp = () => {
+      document.removeEventListener("mousemove", onMove)
+      document.removeEventListener("mouseup", onUp)
+      setActId(null)
+      savePos(persistenceKey, wRef.current)
+
+      const final = wRef.current.get(id)
+      if (final && width > 0 && onLayoutChange) {
+        const gi = toGrid(id, final, width, rowHeight, margin[0])
+        const lg = layouts.lg ?? []
+        onLayoutChange(
+          lg.map(item => item.i === id ? { ...item, x: gi.x, y: gi.y, w: gi.w, h: gi.h } : item),
+          { ...layouts, lg: lg.map(item => item.i === id ? { ...item, x: gi.x, y: gi.y, w: gi.w, h: gi.h } : item) }
+        )
+      }
+    }
+
+    document.addEventListener("mousemove", onMove)
+    document.addEventListener("mouseup", onUp)
+  }, [onLayoutChange, width, rowHeight, margin, persistenceKey, layouts])
 
   if (!mounted) return <div ref={containerRef} style={{ width: '100%', minHeight: 400 }} />
 
@@ -77,23 +206,28 @@ export function GridWrapper({
     <div ref={containerRef} style={{ width: '100%' }}>
       {width > 0 && (
         <div className="relative" style={{ height: th, overflow: 'hidden' }}>
-          {Array.from(widgets.entries()).map(([id, pos]) => (
-            <div
-              key={id}
-              className="absolute"
-              style={{
-                left: pos.x, top: pos.y,
-                width: pos.width, height: pos.height,
-                cursor: 'move', zIndex: 1,
-                userSelect: 'none', touchAction: 'none',
-              }}
-            >
-              {React.Children.map(children, (ch) => {
-                if (React.isValidElement(ch) && String(ch.key) === id) return ch
-                return null
-              })}
-            </div>
-          ))}
+          {Array.from(widgets.entries()).map(([id, pos]) => {
+            const active = actId === id
+            return (
+              <div
+                key={id}
+                onMouseDown={(e) => onDown(e, id)}
+                className="absolute"
+                style={{
+                  left: pos.x, top: pos.y,
+                  width: pos.width, height: pos.height,
+                  cursor: 'move',
+                  zIndex: active ? 100 : 1,
+                  userSelect: 'none', touchAction: 'none',
+                }}
+              >
+                {React.Children.map(children, (ch) => {
+                  if (React.isValidElement(ch) && String(ch.key) === id) return ch
+                  return null
+                })}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
