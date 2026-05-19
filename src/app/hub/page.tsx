@@ -8,8 +8,11 @@ import LiquidBackground from '@/components/LiquidBackground'
 import DashboardGrid from '@/components/dashboard/DashboardGrid'
 import ManageWidgetsPanel from '@/components/dashboard/ManageWidgetsPanel'
 import WidgetPicker from '@/components/dashboard/WidgetPicker'
+import GridControlPanel from '@/components/shared/GridControlPanel'
 import { WIDGET_REGISTRY } from '@/lib/widgetRegistry'
-import { Settings, Plus } from 'lucide-react'
+import { useGridLayout } from '@/hooks/useGridLayout'
+import { HUB_DEFAULT_LAYOUTS } from '@/lib/layout'
+import { Settings, Plus, Check } from 'lucide-react'
 
 const HIDDEN_KEY  = 'adversity-hub-hidden'
 const DELETED_KEY = 'adversity-hub-deleted'
@@ -49,6 +52,18 @@ export default function HubPage() {
     setDeletedSet(prev => { const n = new Set(prev); n.delete(id); saveSet(DELETED_KEY, n); return n })
     setHiddenSet(prev  => { const n = new Set(prev); n.delete(id); saveSet(HIDDEN_KEY,  n); return n })
   }, [])
+  const addWidget = useCallback((id: string) => restoreWidget(id), [restoreWidget])
+
+  const {
+    layouts, handleLayoutChange, loaded,
+    switchMode, setSwitchMode, selectedId, handleWidgetClick,
+    resetLayout, shuffleLayout, applyPreset, resizeWidget,
+    gridOverlay, setGridOverlay,
+  } = useGridLayout({
+    page: 'hub',
+    defaultLayouts: HUB_DEFAULT_LAYOUTS,
+    widgetIds: visibleWidgetIds,
+  })
 
   if (!initialized) return (
     <div className="flex h-screen overflow-hidden">
@@ -58,6 +73,8 @@ export default function HubPage() {
       </main>
     </div>
   )
+
+  const registryById = new Map(WIDGET_REGISTRY.map(w => [w.id, w]))
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -72,14 +89,26 @@ export default function HubPage() {
             <p className="text-xs text-[var(--color-text-muted)]">Your personal command center</p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setPickerOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-[var(--color-border)] transition-colors text-xs text-[var(--color-text-muted)]">
-              <Plus size={14} /> Add
-            </button>
-            <button onClick={() => setManageOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-[var(--color-border)] transition-colors text-xs text-[var(--color-text-muted)]">
-              <Settings size={14} /> Customize
-            </button>
+            {!switchMode && (
+              <>
+                <button onClick={() => setPickerOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-[var(--color-border)] transition-colors text-xs text-[var(--color-text-muted)]">
+                  <Plus size={14} /> Add
+                </button>
+                <button onClick={() => setManageOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-[var(--color-border)] transition-colors text-xs text-[var(--color-text-muted)]">
+                  <Settings size={14} /> Customize
+                </button>
+              </>
+            )}
           </div>
         </div>
+
+        {switchMode && selectedId && (
+          <div className="px-4 md:px-6 pb-2">
+            <div className="text-[10px] font-mono text-[var(--color-accent)] uppercase tracking-wider">
+              Selected: {registryById.get(selectedId)?.label} — click another widget to swap positions
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
           {visibleWidgetIds.length === 0 ? (
@@ -92,14 +121,39 @@ export default function HubPage() {
               </button>
             </div>
           ) : (
-            <DashboardGrid
-              visibleWidgetIds={visibleWidgetIds}
-              onHide={hideWidget}
-              onDelete={deleteWidget}
-            />
+            <div className="relative">
+              {/* Grid overlay */}
+              {gridOverlay && (
+                <div className="absolute inset-0 z-0 pointer-events-none" style={{
+                  backgroundImage: 'linear-gradient(rgba(215,179,106,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(215,179,106,0.04) 1px, transparent 1px)',
+                  backgroundSize: `${100 / 12}% 72px`,
+                }} />
+              )}
+              <DashboardGrid
+                visibleWidgetIds={visibleWidgetIds}
+                onHide={hideWidget}
+                onDelete={deleteWidget}
+                switchMode={switchMode}
+                selectedId={selectedId}
+                onWidgetClick={handleWidgetClick}
+              />
+            </div>
           )}
         </div>
       </main>
+
+      {/* Control panel */}
+      <GridControlPanel
+        switchMode={switchMode}
+        onToggleSwitch={() => { setSwitchMode(!switchMode); setSelectedId(null) }}
+        onReset={resetLayout}
+        onShuffle={shuffleLayout}
+        onPreset={applyPreset}
+        gridOverlay={gridOverlay}
+        onToggleOverlay={() => setGridOverlay(!gridOverlay)}
+        selectedId={selectedId}
+        onWidgetSize={resizeWidget}
+      />
 
       <ManageWidgetsPanel
         open={manageOpen}
@@ -116,7 +170,7 @@ export default function HubPage() {
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
         existingIds={existingIds}
-        onAdd={(id) => restoreWidget(id)}
+        onAdd={addWidget}
       />
     </div>
   )

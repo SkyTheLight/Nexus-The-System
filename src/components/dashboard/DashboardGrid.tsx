@@ -6,14 +6,18 @@ import { useGridLayout } from '@/hooks/useGridLayout'
 import WidgetShell from './WidgetShell'
 import { WIDGET_REGISTRY } from '@/lib/widgetRegistry'
 import { HUB_DEFAULT_LAYOUTS, HUB_GRID, layoutsForVisible } from '@/lib/layout'
+import { Check } from 'lucide-react'
 
 interface DashboardGridProps {
   visibleWidgetIds: string[]
   onHide:   (id: string) => void
   onDelete: (id: string) => void
+  switchMode?: boolean
+  selectedId?: string | null
+  onWidgetClick?: (id: string) => void
 }
 
-export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: DashboardGridProps) {
+export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete, switchMode, selectedId, onWidgetClick }: DashboardGridProps) {
   const { layouts, handleLayoutChange, loaded } = useGridLayout({
     page: 'hub',
     defaultLayouts: HUB_DEFAULT_LAYOUTS,
@@ -47,16 +51,29 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: Da
         const entry = registryById.get(id)
         if (!entry) return null
         const Component = entry.component
+        const isSelected = selectedId === id
+
         return (
-          <div key={id} className="widget-shell-group">
-            <WidgetShell
-              id={id}
-              label={entry.label}
-              onHide={() => onHide(id)}
-              onDelete={() => onDelete(id)}
-            >
-              <Component />
-            </WidgetShell>
+          <div
+            key={id}
+            className={`widget-shell-group transition-all duration-200 ${switchMode ? 'cursor-pointer' : ''}`}
+            onClick={() => onWidgetClick?.(id)}
+          >
+            <div className={`relative ${isSelected ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--color-bg)]' : ''}`}>
+              {switchMode && (
+                <div className="absolute top-2 right-2 z-10 w-5 h-5 rounded-full bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/40 flex items-center justify-center">
+                  <Check size={10} className="text-[var(--color-accent)]" />
+                </div>
+              )}
+              <WidgetShell
+                id={id}
+                label={entry.label}
+                onHide={() => onHide(id)}
+                onDelete={() => onDelete(id)}
+              >
+                <Component />
+              </WidgetShell>
+            </div>
           </div>
         )
       })}
