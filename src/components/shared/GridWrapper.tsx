@@ -47,7 +47,8 @@ export function GridWrapper({
     if (containerRef.current) ro.observe(containerRef.current)
     window.addEventListener("resize", measure)
     return () => {
-      clearTimeout(t1); clearTimeout(t2)
+      clearTimeout(t1)
+      clearTimeout(t2)
       ro.disconnect()
       window.removeEventListener("resize", measure)
     }

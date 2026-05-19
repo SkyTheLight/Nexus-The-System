@@ -427,3 +427,37 @@ html, body {
   --color-accent: #999999;
   --color-accent-muted: rgba(153, 153, 153, 0.5);
 }
+
+/* ── Grid drag/resize polish ── */
+.react-grid-item {
+  transition: transform 200ms ease, width 200ms ease, height 200ms ease;
+}
+.react-grid-item.react-draggable-dragging,
+.react-grid-item.resizing {
+  transition: none !important;
+  z-index: 100 !important;
+}
+.react-grid-item.react-grid-placeholder {
+  background: rgba(0, 212, 255, 0.08) !important;
+  border: 1px dashed rgba(0, 212, 255, 0.4) !important;
+  border-radius: 8px !important;
+  opacity: 1 !important;
+}
+.react-resizable-handle {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 10 !important;
+}
+.widget-shell-group:hover .react-resizable-handle,
+.react-grid-item:hover > .react-resizable-handle {
+  opacity: 1 !important;
+}
+.react-resizable-handle::after {
+  border-color: var(--color-accent) !important;
+  width: 7px !important;
+  height: 7px !important;
+}
+.widget-shell-group {
+  height: 100%;
+  width: 100%;
+}

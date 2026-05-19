@@ -19,7 +19,10 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: Da
     defaultLayouts: HUB_DEFAULT_LAYOUTS,
   })
 
-  const registryById = useMemo(() => new Map(WIDGET_REGISTRY.map(w => [w.id, w])), [])
+  const registryById = useMemo(
+    () => new Map(WIDGET_REGISTRY.map(w => [w.id, w])),
+    []
+  )
 
   const displayLayouts = useMemo(
     () => layoutsForVisible(layouts, visibleWidgetIds),
@@ -27,8 +30,8 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: Da
   )
 
   if (!loaded) return (
-    <div className="text-[var(--sl-text-muted)] font-mono text-xs tracking-widest py-8 text-center uppercase">
-      ◈ Initializing System...
+    <div className="text-[var(--color-text-muted)] text-xs py-8 text-center font-mono uppercase tracking-widest">
+      Loading grid...
     </div>
   )
 
@@ -46,7 +49,12 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: Da
         const Component = entry.component
         return (
           <div key={id} className="widget-shell-group">
-            <WidgetShell id={id} label={entry.label} onHide={() => onHide(id)} onDelete={() => onDelete(id)}>
+            <WidgetShell
+              id={id}
+              label={entry.label}
+              onHide={() => onHide(id)}
+              onDelete={() => onDelete(id)}
+            >
               <Component />
             </WidgetShell>
           </div>

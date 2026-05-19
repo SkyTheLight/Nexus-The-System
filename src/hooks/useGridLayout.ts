@@ -26,7 +26,7 @@ export function useGridLayout({ page, defaultLayouts }: UseGridLayoutOptions) {
     const saved = loadLayouts(page, defaultLayouts)
     setLayouts(saved)
     setLoaded(true)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page])
 
   useEffect(() => {

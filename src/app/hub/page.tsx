@@ -24,11 +24,11 @@ function saveSet(key: string, set: Set<string>) {
 
 export default function HubPage() {
   const { sidebarOpen } = useAppStore()
-  const [initialized, setInitialized]  = useState(false)
-  const [hiddenSet,   setHiddenSet]    = useState<Set<string>>(new Set())
-  const [deletedSet,  setDeletedSet]   = useState<Set<string>>(new Set())
-  const [manageOpen,  setManageOpen]   = useState(false)
-  const [pickerOpen,  setPickerOpen]   = useState(false)
+  const [initialized, setInitialized] = useState(false)
+  const [hiddenSet,   setHiddenSet]   = useState<Set<string>>(new Set())
+  const [deletedSet,  setDeletedSet]  = useState<Set<string>>(new Set())
+  const [manageOpen,  setManageOpen]  = useState(false)
+  const [pickerOpen,  setPickerOpen]  = useState(false)
 
   useEffect(() => {
     setHiddenSet(loadSet(HIDDEN_KEY))
@@ -36,7 +36,7 @@ export default function HubPage() {
     setInitialized(true)
   }, [])
 
-  const allIds = useMemo(() => WIDGET_REGISTRY.map(w => w.id), [])
+  const allIds           = useMemo(() => WIDGET_REGISTRY.map(w => w.id), [])
   const visibleWidgetIds = useMemo(() => allIds.filter(id => !hiddenSet.has(id) && !deletedSet.has(id)), [allIds, hiddenSet, deletedSet])
   const hiddenWidgets    = useMemo(() => allIds.filter(id => hiddenSet.has(id) && !deletedSet.has(id)), [allIds, hiddenSet, deletedSet])
   const deletedWidgets   = useMemo(() => allIds.filter(id => deletedSet.has(id)), [allIds, deletedSet])
@@ -49,62 +49,46 @@ export default function HubPage() {
     setDeletedSet(prev => { const n = new Set(prev); n.delete(id); saveSet(DELETED_KEY, n); return n })
     setHiddenSet(prev  => { const n = new Set(prev); n.delete(id); saveSet(HIDDEN_KEY,  n); return n })
   }, [])
-  const addWidget = useCallback((id: string) => restoreWidget(id), [restoreWidget])
 
   if (!initialized) return (
-    <div className="flex h-screen items-center justify-center bg-[#06060a]">
-      <div className="text-[var(--sl-gold)] font-mono text-xs tracking-widest uppercase animate-pulse">
-        ◈ System Initializing...
-      </div>
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
+      <main className="flex-1 ml-64 flex items-center justify-center">
+        <div className="text-[var(--color-text-muted)] text-sm">Loading...</div>
+      </main>
     </div>
   )
 
   return (
-    <div className="flex h-screen overflow-hidden" data-theme="solo-leveling">
+    <div className="flex h-screen overflow-hidden">
       <LiquidBackground />
       <Sidebar />
-
-      <main className={`flex-1 flex flex-col relative z-10 transition-all duration-300 ${sidebarOpen ? 'ml-[220px]' : 'ml-[56px]'}`}>
+      <main className={`flex-1 flex flex-col relative z-10 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
         <TopNav />
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-[var(--sl-border)]">
+        <div className="flex items-center justify-between px-4 md:px-6 pt-4 md:pt-6 pb-2">
           <div>
-            <h1 className="text-base font-['Cinzel'] font-semibold text-[var(--sl-gold)] tracking-widest uppercase">
-              ◈ Focus Board
-            </h1>
-            <p className="text-[10px] font-mono text-[var(--sl-text-muted)] tracking-wider uppercase mt-0.5">
-              Personal Command Center — Active
-            </p>
+            <h1 className="text-lg font-bold text-white">Focus Board</h1>
+            <p className="text-xs text-[var(--color-text-muted)]">Your personal command center</p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPickerOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-[var(--sl-border)] text-[var(--sl-text-muted)] hover:text-[var(--sl-gold)] hover:border-[var(--sl-border-hov)] transition-all"
-            >
-              <Plus size={12} /> Add Widget
+            <button onClick={() => setPickerOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-[var(--color-border)] transition-colors text-xs text-[var(--color-text-muted)]">
+              <Plus size={14} /> Add
             </button>
-            <button
-              onClick={() => setManageOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-[var(--sl-border)] text-[var(--sl-text-muted)] hover:text-[var(--sl-gold)] hover:border-[var(--sl-border-hov)] transition-all"
-            >
-              <Settings size={12} /> Customize
+            <button onClick={() => setManageOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-[var(--color-border)] transition-colors text-xs text-[var(--color-text-muted)]">
+              <Settings size={14} /> Customize
             </button>
           </div>
         </div>
 
-        {/* Grid */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
           {visibleWidgetIds.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center gap-4">
-              <p className="text-xs font-mono text-[var(--sl-text-muted)] uppercase tracking-widest">
-                No active widgets in the System
-              </p>
-              <button
-                onClick={() => setPickerOpen(true)}
-                className="px-4 py-2 text-[10px] font-mono uppercase tracking-widest border border-[var(--sl-gold)] text-[var(--sl-gold)] hover:bg-[var(--sl-gold-dim)] transition-all"
-              >
-                ◈ Deploy Widgets
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <div className="text-sm text-[var(--color-text-muted)] mb-4">
+                {deletedWidgets.length > 0 ? 'All widgets are hidden or deleted.' : 'Your dashboard is empty.'}
+              </div>
+              <button onClick={() => setPickerOpen(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-sm text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors">
+                <Plus size={16} /> Add widgets
               </button>
             </div>
           ) : (
@@ -132,7 +116,7 @@ export default function HubPage() {
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
         existingIds={existingIds}
-        onAdd={addWidget}
+        onAdd={(id) => restoreWidget(id)}
       />
     </div>
   )
