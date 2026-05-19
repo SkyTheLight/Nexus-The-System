@@ -95,10 +95,10 @@ export default function PinnedWidget() {
     return (
       <>
 <div className="hud-card-header drag-handle">
-          <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ INTEL BOARD</span>
-          <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
+          <span className="text-[clamp(10px,1.5cqw,12px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ INTEL BOARD</span>
+          <span className="text-[clamp(9px,1.3cqw,11px)] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
-        <button onClick={fetchItems} className="font-mono text-[#d7b36a] hover:underline text-left mt-2" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>Retry ↗</button>
+        <button onClick={fetchItems} className="font-mono text-[#d7b36a] hover:underline text-left mt-2" style={{ fontSize: 'clamp(11px,1.8cqw,13px)' }}>Retry ↗</button>
       </>
     )
   }
@@ -106,12 +106,12 @@ export default function PinnedWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ INTEL BOARD</span>
-        <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#22c55e] uppercase tracking-[0.15em]">{items.length} ITEMS</span>
+        <span className="text-[clamp(10px,1.5cqw,12px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ INTEL BOARD</span>
+        <span className="text-[clamp(9px,1.3cqw,11px)] font-mono text-[#22c55e] uppercase tracking-[0.15em]">{items.length} ITEMS</span>
       </div>
       <div className="flex-1 overflow-y-auto space-y-1.5">
         {items.length === 0 ? (
-          <div className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}>&gt; NO INTEL PINNED. ACCESS HUB TO PIN INTEL.</div>
+          <div className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(12px,1.9cqw,14px)' }}>&gt; NO INTEL PINNED. ACCESS HUB TO PIN INTEL.</div>
         ) : (
           items.map(item => (
             <div key={`${item.type}-${item.id}`}>
@@ -120,17 +120,17 @@ export default function PinnedWidget() {
                 className="w-full text-left border-l-2 border-[#7c3aed] pl-2 py-1.5 hover:bg-[#111124] transition-colors duration-150"
               >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono font-bold text-[#f7f1e4] truncate" style={{ fontSize: 'clamp(10px,1.8cqw,12px)' }}>{item.title}</span>
-                    <span className="rc-hide-xs font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>{item.type}</span>
+                    <span className="font-mono font-bold text-[#f7f1e4] truncate" style={{ fontSize: 'clamp(13px,2.2cqw,15px)' }}>{item.title}</span>
+                    <span className="rc-hide-xs font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0" style={{ fontSize: 'clamp(9px,1.3cqw,11px)' }}>{item.type}</span>
                   </div>
                   {item.content && (
-                  <div className="rc-hide-sm font-mono text-[#6b5a30] mt-0.5 truncate" style={{ fontSize: 'clamp(9px,1.4cqw,11px)' }}>{firstLine(item.content)}</div>
+                  <div className="rc-hide-sm font-mono text-[#6b5a30] mt-0.5 truncate" style={{ fontSize: 'clamp(12px,1.8cqw,14px)' }}>{firstLine(item.content)}</div>
                 )}
               </button>
               <button
                 onClick={() => togglePin(item)}
                 className="font-mono text-[#6b5a30] hover:text-[#7c3aed] transition-colors mt-0.5 ml-2 uppercase tracking-[0.15em]"
-                style={{ fontSize: 'clamp(6px,1cqw,8px)' }}
+                style={{ fontSize: 'clamp(9px,1.3cqw,11px)' }}
               >
                 {items.some(p => p.id === item.id && p.type === item.type) ? '[ unpin ]' : '[ pin ]'}
               </button>
