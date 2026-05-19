@@ -326,6 +326,33 @@ html, body {
   z-index: 2;
 }
 
+/* ===== RESPONSIVE CONTAINER QUERIES ===== */
+/* Widget content adapts at different sizes */
+@container widget (max-width: 220px) {
+  .hud-card { padding: 6px !important; }
+  .widget-drag-bar { padding: 4px 6px !important; }
+  .widget-drag-bar > span:not(:first-child) { display: none !important; }
+  .rc-hide-xs { display: none !important; }
+  .rc-show-xs  { display: revert !important; }
+}
+
+@container widget (min-width: 221px) and (max-width: 380px) {
+  .hud-card { padding: 8px !important; }
+  .widget-drag-bar { padding: 4px 10px !important; }
+  .rc-hide-sm { display: none !important; }
+  .rc-show-sm { display: revert !important; }
+}
+
+@container widget (min-width: 381px) and (max-width: 550px) {
+  .rc-hide-md { display: none !important; }
+  .rc-show-md { display: revert !important; }
+}
+
+@container widget (min-width: 551px) {
+  .rc-hide-lg { display: none !important; }
+  .rc-show-lg { display: revert !important; }
+}
+
 /* ===== UTILITY CLASSES ===== */
 .sl-badge {
   display: inline-block;

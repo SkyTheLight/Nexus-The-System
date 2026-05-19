@@ -114,9 +114,9 @@ export default function HolidayWidget() {
             <div className="font-mono font-bold text-[#f7f1e4]" style={{ fontSize: 'clamp(13px,3cqw,18px)' }}>{nextHoliday.localName}</div>
             <div className="mt-1 flex items-baseline flex-wrap gap-1">
               <span className="font-mono font-bold text-[#d7b36a]" style={{ fontSize: 'clamp(16px,4cqw,26px)' }}>{daysLeft}</span>
-              <span className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(7px,1.2cqw,10px)' }}>DAYS UNTIL NEXT STAND DOWN</span>
+              <span className="rc-hide-xs font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(7px,1.2cqw,10px)' }}>DAYS UNTIL NEXT STAND DOWN</span>
             </div>
-            <div className="font-mono text-[#6b5a30] mt-0.5" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>{formatDate(nextHoliday.date)}</div>
+            <div className="rc-hide-sm font-mono text-[#6b5a30] mt-0.5" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>{formatDate(nextHoliday.date)}</div>
           </>
         ) : (
           <div className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(9px,1.6cqw,12px)' }}>No upcoming holidays found.</div>

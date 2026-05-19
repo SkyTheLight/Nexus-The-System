@@ -119,12 +119,12 @@ export default function PinnedWidget() {
                 onClick={() => setSelected(item)}
                 className="w-full text-left border-l-2 border-[#7c3aed] pl-2 py-1.5 hover:bg-[#111124] transition-colors duration-150"
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono font-bold text-[#f7f1e4] truncate" style={{ fontSize: 'clamp(10px,1.8cqw,12px)' }}>{item.title}</span>
-                  <span className="font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>{item.type}</span>
-                </div>
-                {item.content && (
-                  <div className="font-mono text-[#6b5a30] mt-0.5 truncate" style={{ fontSize: 'clamp(9px,1.4cqw,11px)' }}>{firstLine(item.content)}</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-[#f7f1e4] truncate" style={{ fontSize: 'clamp(10px,1.8cqw,12px)' }}>{item.title}</span>
+                    <span className="rc-hide-xs font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>{item.type}</span>
+                  </div>
+                  {item.content && (
+                  <div className="rc-hide-sm font-mono text-[#6b5a30] mt-0.5 truncate" style={{ fontSize: 'clamp(9px,1.4cqw,11px)' }}>{firstLine(item.content)}</div>
                 )}
               </button>
               <button

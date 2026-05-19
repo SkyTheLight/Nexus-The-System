@@ -87,7 +87,7 @@ export default function TasksWidget() {
     <>
       <div className="hud-card-header">
         <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
-        <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#22c55e] uppercase tracking-[0.15em]">
+        <span className="rc-hide-xs text-[clamp(6px,1cqw,8px)] font-mono text-[#22c55e] uppercase tracking-[0.15em]">
           {tasks.length === 0 ? 'ALL CLEAR' : `${tasks.length} ACTIVE`}
         </span>
       </div>
@@ -115,7 +115,7 @@ export default function TasksWidget() {
 
         <form
           onSubmit={(e) => { e.preventDefault(); addTask() }}
-          className="mt-2 pt-2 border-t border-[#1a1a2e]"
+          className="rc-hide-sm mt-2 pt-2 border-t border-[#1a1a2e]"
         >
           <div className="flex items-center gap-1">
             <span className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>&gt;</span>

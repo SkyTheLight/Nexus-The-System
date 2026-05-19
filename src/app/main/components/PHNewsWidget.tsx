@@ -101,10 +101,10 @@ export default function PHNewsWidget() {
                   >
                     [{attrs.label}]
                   </span>
-                  <span className="font-mono text-[#6b5a30] uppercase tracking-[0.1em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>[{item.category?.toUpperCase() || 'GENERAL'}]</span>
+                  <span className="rc-hide-xs font-mono text-[#6b5a30] uppercase tracking-[0.1em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>[{item.category?.toUpperCase() || 'GENERAL'}]</span>
                 </div>
                 <div className="font-mono text-[#f7f1e4] mt-0.5" style={{ fontSize: 'clamp(10px,1.7cqw,12px)' }}>{item.title}</div>
-                <div className="font-mono text-[#6b5a30] mt-0.5 line-clamp-2" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>{item.summary}</div>
+                <div className="rc-hide-sm font-mono text-[#6b5a30] mt-0.5 line-clamp-2" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>{item.summary}</div>
               </div>
             )
           })

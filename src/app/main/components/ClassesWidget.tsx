@@ -151,7 +151,7 @@ export default function ClassesWidget() {
         </div>
 
         {/* Upcoming Assignments */}
-        <div className="pt-2 border-t border-[#1a1a2e]">
+        <div className="rc-hide-sm pt-2 border-t border-[#1a1a2e]">
           <div className="font-mono text-[#6b5a30] uppercase tracking-[0.25em] mb-1" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>DEPLOYMENTS DUE</div>
           {assignments.length === 0 ? (
             <div className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}>&gt; NO PENDING DEPLOYMENTS.</div>
@@ -167,7 +167,7 @@ export default function ClassesWidget() {
                   <div key={a.id} className="flex items-center justify-between py-0.5">
                     <div className="flex items-center gap-2 min-w-0">
                       {a.course && (
-                        <span className="font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>{a.course}</span>
+                        <span className="rc-hide-xs font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>{a.course}</span>
                       )}
                       <span className="font-mono text-[#f7f1e4] truncate" style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}>{a.title}</span>
                     </div>

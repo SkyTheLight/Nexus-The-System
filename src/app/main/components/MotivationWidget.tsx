@@ -71,9 +71,9 @@ export default function MotivationWidget() {
         {cached && <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#6b5a30] uppercase tracking-[0.15em]">CACHED</span>}
       </div>
       <div className="flex-1 flex flex-col justify-center">
-        <div className="font-mono text-[#7c3aed] uppercase tracking-[0.15em] mb-2" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>DAILY DIRECTIVE &gt;</div>
+        <div className="rc-hide-xs font-mono text-[#7c3aed] uppercase tracking-[0.15em] mb-2" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>DAILY DIRECTIVE &gt;</div>
         <div className="font-mono italic text-[#7c3aed] leading-relaxed line-clamp-4" style={{ fontSize: 'clamp(11px,2.2cqw,15px)' }}>&ldquo;{line}&rdquo;</div>
-        <div className="font-mono text-[#6b5a30] mt-2" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>— SYSTEM</div>
+        <div className="rc-hide-sm font-mono text-[#6b5a30] mt-2" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>— SYSTEM</div>
       </div>
     </>
   )
