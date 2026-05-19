@@ -24,6 +24,7 @@ import WeatherWidget from '@/components/widgets/Weather'
 import ClassScheduleWidget from '@/components/widgets/ClassSchedule'
 import CanvasAnnouncements from '@/components/widgets/CanvasAnnouncements'
 import ScreenTimeWidget from '@/components/widgets/ScreenTime'
+import PixelaWidget from '@/components/widgets/Pixela'
 
 export interface WidgetRegistryEntry {
   id: string
@@ -58,10 +59,11 @@ export const WIDGET_REGISTRY: WidgetRegistryEntry[] = [
   { id: 'class-schedule', component: ClassScheduleWidget, label: 'Class Schedule', defaultCols: 2, defaultHeight: 'default' },
   { id: 'canvas-announcements', component: CanvasAnnouncements, label: 'Canvas Announcements', defaultCols: 2, defaultHeight: 'default' },
   { id: 'screen-time', component: ScreenTimeWidget, label: 'Screen Time', defaultCols: 1, defaultHeight: 'compact' },
+  { id: 'pixela', component: PixelaWidget, label: 'Habit Tracker', defaultCols: 1, defaultHeight: 'compact' },
 ]
 
 export const DEFAULT_WIDGET_ORDER = [
-  'date-highlight', 'weather', 'level', 'spotify-now', 'screen-time',
+  'date-highlight', 'weather', 'level', 'spotify-now', 'screen-time', 'pixela',
   'todos', 'goals', 'calendar', 'assignments', 'class-schedule', 'canvas-announcements',
   'notes', 'github', 'performance', 'timeline',
   'ideas', 'music', 'certificates',

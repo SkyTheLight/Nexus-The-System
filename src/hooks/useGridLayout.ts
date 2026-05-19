@@ -149,6 +149,7 @@ export function useGridLayout({ page, defaultLayouts, widgetIds = [] }: UseGridL
       const next = prev.map(c => ({
         ...c,
         preferW: Math.min(w, c.maxW),
+        preferH: Math.min(h, c.maxH),
         minH: Math.min(h, c.maxH),
       }))
       saveConstraints(page, next)
@@ -173,6 +174,7 @@ export function useGridLayout({ page, defaultLayouts, widgetIds = [] }: UseGridL
         return {
           ...c,
           preferW: Math.min(w, c.maxW),
+          preferH: Math.min(h, c.maxH),
           minH: Math.min(h, c.maxH),
         }
       })

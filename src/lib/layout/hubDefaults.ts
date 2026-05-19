@@ -28,6 +28,7 @@ export const HUB_DEFAULT_LAYOUTS: Layouts = {
     { i: 'quick-links', x: 8, y: 47, w: 4, h: 5, minW: 3, minH: 3 },
     { i: 'site-buttons', x: 0, y: 52, w: 6, h: 5, minW: 4, minH: 3 },
     { i: 'spotify-now', x: 6, y: 52, w: 6, h: 5, minW: 4, minH: 3 },
+    { i: 'pixela', x: 0, y: 57, w: 4, h: 5, minW: 3, minH: 3 },
   ],
   md: [
     { i: 'todos', x: 0, y: 0, w: 5, h: 7 },
@@ -56,5 +57,6 @@ export const HUB_DEFAULT_LAYOUTS: Layouts = {
     { i: 'quick-links', x: 7, y: 64, w: 3, h: 5 },
     { i: 'site-buttons', x: 0, y: 69, w: 5, h: 5 },
     { i: 'spotify-now', x: 5, y: 69, w: 5, h: 5 },
+    { i: 'pixela', x: 0, y: 74, w: 5, h: 5 },
   ],
 }

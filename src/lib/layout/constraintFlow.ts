@@ -7,6 +7,7 @@ export interface WidgetConstraint {
   preferW: number
   minW: number
   maxW: number
+  preferH?: number
   minH: number
   maxH: number
   order: number
@@ -65,6 +66,7 @@ export function layoutToConstraints(layout: Layout): WidgetConstraint[] {
       maxW: item.maxW ?? 12,
       minH: item.minH ?? item.h,
       maxH: item.maxH ?? 12,
+      preferH: item.h,
       order: i,
     }))
 }
@@ -107,8 +109,9 @@ export function constraintsToLayout(
       }
     }
 
-    out.push({ i: c.id, x: bestX, y: bestY, w: bestW, h: c.minH })
-    for (let x = bestX; x < bestX + bestW; x++) colHeight[x] = bestY + c.minH
+    const h = c.preferH ?? c.minH
+    out.push({ i: c.id, x: bestX, y: bestY, w: bestW, h })
+    for (let x = bestX; x < bestX + bestW; x++) colHeight[x] = bestY + h
   }
 
   return out
@@ -149,6 +152,7 @@ export function updateConstraintsFromPositions(
       maxW: prev?.maxW ?? 12,
       minH: prev?.minH ?? item.h,
       maxH: prev?.maxH ?? 12,
+      preferH: prev?.preferH ?? item.h,
       order: i,
     })
     touched.add(item.i)
