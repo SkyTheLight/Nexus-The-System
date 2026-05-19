@@ -84,12 +84,12 @@ export default function HolidayWidget() {
     return (
       <>
 <div className="hud-card-header drag-handle">
-          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ CALENDAR INTEL</span>
-          <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
+          <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ CALENDAR INTEL</span>
+          <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
         <div className="flex-1 flex flex-col justify-center">
-          <div className="text-[12px] font-mono text-[#f7f1e4]">Failed to load.</div>
-          <button onClick={fetchHolidays} className="text-[10px] font-mono text-[#d7b36a] hover:underline mt-1 text-left">Retry ↗</button>
+          <div className="font-mono text-[#f7f1e4]" style={{ fontSize: 'clamp(10px,2cqw,12px)' }}>Failed to load.</div>
+          <button onClick={fetchHolidays} className="font-mono text-[#d7b36a] hover:underline mt-1 text-left" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>Retry ↗</button>
         </div>
       </>
     )
@@ -98,28 +98,28 @@ export default function HolidayWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ CALENDAR INTEL</span>
-        <span className="text-[8px] font-mono text-[#22c55e] uppercase tracking-[0.15em]">ONLINE</span>
+        <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ CALENDAR INTEL</span>
+        <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#22c55e] uppercase tracking-[0.15em]">ONLINE</span>
       </div>
       <div className="flex-1 flex flex-col justify-center">
         {todayHoliday ? (
           <>
-            <div className="text-[9px] font-mono text-[#22c55e] uppercase tracking-[0.2em] mb-1">[ HOLIDAY DETECTED ]</div>
-            <div className="text-[18px] font-mono font-bold text-[#22c55e]">{todayHoliday.localName}</div>
-            <div className="text-[11px] font-mono text-[#6b5a30] mt-1">STAND DOWN, BOSS. NO OPERATIONS TODAY.</div>
+            <div className="font-mono text-[#22c55e] uppercase tracking-[0.2em] mb-1" style={{ fontSize: 'clamp(7px,1.2cqw,9px)' }}>[ HOLIDAY DETECTED ]</div>
+            <div className="font-mono font-bold text-[#22c55e]" style={{ fontSize: 'clamp(13px,3cqw,18px)' }}>{todayHoliday.localName}</div>
+            <div className="font-mono text-[#6b5a30] mt-1" style={{ fontSize: 'clamp(8px,1.5cqw,11px)' }}>STAND DOWN, BOSS. NO OPERATIONS TODAY.</div>
           </>
         ) : nextHoliday ? (
           <>
-            <div className="text-[9px] font-mono text-[#6b5a30] uppercase tracking-[0.2em] mb-1">NEXT STAND DOWN</div>
-            <div className="text-[18px] font-mono font-bold text-[#f7f1e4]">{nextHoliday.localName}</div>
-            <div className="mt-1">
-              <span className="text-[24px] font-mono font-bold text-[#d7b36a]">{daysLeft}</span>
-              <span className="text-[11px] font-mono text-[#6b5a30] ml-1">DAYS UNTIL NEXT STAND DOWN</span>
+            <div className="font-mono text-[#6b5a30] uppercase tracking-[0.2em] mb-1" style={{ fontSize: 'clamp(7px,1.2cqw,9px)' }}>NEXT STAND DOWN</div>
+            <div className="font-mono font-bold text-[#f7f1e4]" style={{ fontSize: 'clamp(13px,3cqw,18px)' }}>{nextHoliday.localName}</div>
+            <div className="mt-1 flex items-baseline flex-wrap gap-1">
+              <span className="font-mono font-bold text-[#d7b36a]" style={{ fontSize: 'clamp(16px,4cqw,26px)' }}>{daysLeft}</span>
+              <span className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(7px,1.2cqw,10px)' }}>DAYS UNTIL NEXT STAND DOWN</span>
             </div>
-            <div className="text-[10px] font-mono text-[#6b5a30] mt-0.5">{formatDate(nextHoliday.date)}</div>
+            <div className="font-mono text-[#6b5a30] mt-0.5" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>{formatDate(nextHoliday.date)}</div>
           </>
         ) : (
-          <div className="text-[12px] font-mono text-[#6b5a30]">No upcoming holidays found.</div>
+          <div className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(9px,1.6cqw,12px)' }}>No upcoming holidays found.</div>
         )}
       </div>
     </>

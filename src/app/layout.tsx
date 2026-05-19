@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import 'react-grid-layout/css/styles.css'
+import 'react-resizable/css/styles.css'
 import QueryProvider from '@/components/QueryProvider'
 import { SearchWrapper } from '@/components/SearchWrapper'
 

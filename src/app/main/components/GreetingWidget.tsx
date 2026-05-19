@@ -68,21 +68,21 @@ export default function GreetingWidget() {
   return (
       <div className="h-full flex flex-col justify-between">
         <div className="hud-card-header drag-handle">
-          <span className="text-[9px] font-mono text-[#6b5a30] uppercase tracking-[0.25em]">■ SYSTEM STATUS</span>
-          <span className="text-[9px] font-mono text-[#d7b36a]">ONLINE</span>
+          <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#6b5a30] uppercase tracking-[0.25em]">■ SYSTEM STATUS</span>
+          <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a]">ONLINE</span>
         </div>
         <div>
-          <div className="text-[20px] md:text-[22px] font-mono font-bold text-[#d7b36a] leading-tight">
-            {getGreeting()} <span className="inline-block w-[10px] h-[22px] bg-[#d7b36a] align-middle ml-0.5 animate-pulse" style={{ animationName: 'cursor-blink', animationDuration: '1s' }} />
+          <div className="font-mono font-bold text-[#d7b36a] leading-tight" style={{ fontSize: 'clamp(14px, 3.5cqw, 22px)' }}>
+            {getGreeting()} <span className="inline-block align-middle ml-0.5 animate-pulse" style={{ width: 'clamp(6px,1cqw,10px)', height: 'clamp(14px,3.5cqw,22px)', backgroundColor: '#d7b36a', animationName: 'cursor-blink', animationDuration: '1s' }} />
           </div>
-          <div className="text-[30px] md:text-[32px] font-mono font-bold text-[#d7b36a] tabular-nums mt-1 leading-tight">{time}</div>
-          <div className="text-[12px] font-mono text-[#6b5a30] mt-1">{getPHDate()}</div>
+          <div className="font-mono font-bold text-[#d7b36a] tabular-nums mt-0.5 leading-tight" style={{ fontSize: 'clamp(18px, 5cqw, 34px)' }}>{time}</div>
+          <div className="font-mono text-[#6b5a30] mt-0.5" style={{ fontSize: 'clamp(9px, 1.6cqw, 12px)' }}>{getPHDate()}</div>
         </div>
 
-        <div className="mt-3">
+        <div className="mt-2">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.25em]">DAY PROGRESS</span>
-            <span className="text-[8px] font-mono text-[#7c3aed]">{Math.round(progress)}%</span>
+            <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#6b5a30] uppercase tracking-[0.25em]">DAY PROGRESS</span>
+            <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#7c3aed]">{Math.round(progress)}%</span>
           </div>
           <div className="h-1 bg-[#12121c] relative overflow-hidden" style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)' }}>
             <div

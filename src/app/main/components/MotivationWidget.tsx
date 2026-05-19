@@ -53,12 +53,12 @@ export default function MotivationWidget() {
     return (
       <>
 <div className="hud-card-header drag-handle">
-          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ SYSTEM MESSAGE</span>
-          <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
+          <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ SYSTEM MESSAGE</span>
+          <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
         <div className="flex-1 flex flex-col justify-center">
-          <div className="text-[12px] font-mono text-[#f7f1e4]">Failed to load.</div>
-          <button onClick={fetchLine} className="text-[10px] font-mono text-[#d7b36a] hover:underline mt-1 text-left">Retry ↗</button>
+          <div className="font-mono text-[#f7f1e4]" style={{ fontSize: 'clamp(10px,2cqw,12px)' }}>Failed to load.</div>
+          <button onClick={fetchLine} className="font-mono text-[#d7b36a] hover:underline mt-1 text-left" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>Retry ↗</button>
         </div>
       </>
     )
@@ -67,13 +67,13 @@ export default function MotivationWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ SYSTEM MESSAGE</span>
-        {cached && <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.15em]">CACHED</span>}
+        <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ SYSTEM MESSAGE</span>
+        {cached && <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#6b5a30] uppercase tracking-[0.15em]">CACHED</span>}
       </div>
       <div className="flex-1 flex flex-col justify-center">
-        <div className="text-[10px] font-mono text-[#7c3aed] uppercase tracking-[0.15em] mb-2">DAILY DIRECTIVE &gt;</div>
-        <div className="text-[14px] font-mono italic text-[#7c3aed] leading-relaxed">&ldquo;{line}&rdquo;</div>
-        <div className="text-[10px] font-mono text-[#6b5a30] mt-2">— SYSTEM</div>
+        <div className="font-mono text-[#7c3aed] uppercase tracking-[0.15em] mb-2" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>DAILY DIRECTIVE &gt;</div>
+        <div className="font-mono italic text-[#7c3aed] leading-relaxed line-clamp-4" style={{ fontSize: 'clamp(11px,2.2cqw,15px)' }}>&ldquo;{line}&rdquo;</div>
+        <div className="font-mono text-[#6b5a30] mt-2" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>— SYSTEM</div>
       </div>
     </>
   )

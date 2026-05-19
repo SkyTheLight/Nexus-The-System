@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Responsive as ResponsiveGridLayout } from "react-grid-layout"
 import type { Layouts, Layout } from "react-grid-layout"
-import "react-grid-layout/css/styles.css"
-import "react-resizable/css/styles.css"
 
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const COLS        = { lg: 12,   md: 10,  sm: 6,   xs: 4,   xxs: 2 }
@@ -23,8 +21,8 @@ export function GridWrapper({
   layouts,
   onLayoutChange,
   children,
-  rowHeight = 72,
-  margin = [12, 12],
+  rowHeight = 48,
+  margin = [4, 4],
   draggableHandle = ".widget-drag-bar",
   onBreakpointChange,
 }: GridWrapperProps) {
@@ -70,7 +68,6 @@ export function GridWrapper({
           isDraggable
           isResizable
           draggableHandle={draggableHandle}
-          draggableCancel="button, input, textarea, select, a, [role='button'], .widget-no-drag"
           resizeHandles={["se", "sw", "ne", "nw", "e", "w", "s", "n"]}
           useCSSTransforms
           onLayoutChange={onLayoutChange}

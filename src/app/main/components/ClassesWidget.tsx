@@ -97,10 +97,10 @@ export default function ClassesWidget() {
     return (
       <>
 <div className="hud-card-header drag-handle">
-          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ TRAINING SCHEDULE</span>
-          <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
+          <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ TRAINING SCHEDULE</span>
+          <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
-        <button onClick={fetchData} className="text-[10px] font-mono text-[#d7b36a] hover:underline text-left mt-2">Retry ↗</button>
+        <button onClick={fetchData} className="font-mono text-[#d7b36a] hover:underline text-left mt-2" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>Retry ↗</button>
       </>
     )
   }
@@ -111,17 +111,17 @@ export default function ClassesWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ TRAINING SCHEDULE</span>
+        <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ TRAINING SCHEDULE</span>
         {assignments.some(a => daysUntil(a.deadline) === 0) && (
-          <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">[ CRITICAL ]</span>
+          <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#ef4444] uppercase tracking-[0.15em]">[ CRITICAL ]</span>
         )}
       </div>
       <div className="flex-1 overflow-y-auto space-y-2">
         {/* Today's Classes */}
         <div>
-          <div className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.25em] mb-1">TODAY'S SESSIONS</div>
+          <div className="font-mono text-[#6b5a30] uppercase tracking-[0.25em] mb-1" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>TODAY'S SESSIONS</div>
           {todayClasses.length === 0 ? (
-            <div className="text-[11px] font-mono text-[#6b5a30]">&gt; NO TRAINING SCHEDULED TODAY, HUNTER.</div>
+            <div className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}>&gt; NO TRAINING SCHEDULED TODAY, HUNTER.</div>
           ) : (
             <div className="space-y-1">
               {todayClasses.map(cls =>
@@ -136,11 +136,11 @@ export default function ClassesWidget() {
                       } ${past ? 'opacity-40' : ''}`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] font-mono text-[#d7b36a] tabular-nums shrink-0">{slot.start}</span>
-                        <span className="text-[11px] font-mono text-[#f7f1e4] truncate">{cls.code}</span>
+                        <span className="font-mono text-[#d7b36a] tabular-nums shrink-0" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>{slot.start}</span>
+                        <span className="font-mono text-[#f7f1e4] truncate" style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}>{cls.code}</span>
                       </div>
                       {active && (
-                        <span className="text-[8px] font-mono text-[#d7b36a] uppercase tracking-[0.2em] shrink-0 ml-2">[ ACTIVE ]</span>
+                        <span className="font-mono text-[#d7b36a] uppercase tracking-[0.2em] shrink-0 ml-2" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>[ ACTIVE ]</span>
                       )}
                     </div>
                   )
@@ -152,9 +152,9 @@ export default function ClassesWidget() {
 
         {/* Upcoming Assignments */}
         <div className="pt-2 border-t border-[#1a1a2e]">
-          <div className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.25em] mb-1">DEPLOYMENTS DUE</div>
+          <div className="font-mono text-[#6b5a30] uppercase tracking-[0.25em] mb-1" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>DEPLOYMENTS DUE</div>
           {assignments.length === 0 ? (
-            <div className="text-[11px] font-mono text-[#6b5a30]">&gt; NO PENDING DEPLOYMENTS.</div>
+            <div className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}>&gt; NO PENDING DEPLOYMENTS.</div>
           ) : (
             <div className="space-y-1">
               {assignments.map(a => {
@@ -167,13 +167,13 @@ export default function ClassesWidget() {
                   <div key={a.id} className="flex items-center justify-between py-0.5">
                     <div className="flex items-center gap-2 min-w-0">
                       {a.course && (
-                        <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0">{a.course}</span>
+                        <span className="font-mono text-[#6b5a30] uppercase tracking-[0.15em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>{a.course}</span>
                       )}
-                      <span className="text-[11px] font-mono text-[#f7f1e4] truncate">{a.title}</span>
+                      <span className="font-mono text-[#f7f1e4] truncate" style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}>{a.title}</span>
                     </div>
                     <span
-                      className="text-[8px] font-mono uppercase tracking-[0.15em] shrink-0 ml-2"
-                      style={{ color: isCritical ? '#ef4444' : isUrgent ? '#f59e0b' : '#d7b36a' }}
+                      className="font-mono uppercase tracking-[0.15em] shrink-0 ml-2"
+                      style={{ color: isCritical ? '#ef4444' : isUrgent ? '#f59e0b' : '#d7b36a', fontSize: 'clamp(6px,1cqw,8px)' }}
                     >
                       [{isCritical ? 'CRITICAL' : isUrgent ? 'URGENT' : 'PENDING'}]
                     </span>

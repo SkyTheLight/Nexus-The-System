@@ -69,10 +69,10 @@ export default function PHNewsWidget() {
     return (
       <>
 <div className="hud-card-header drag-handle">
-          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ WORLD THREAT LEVEL</span>
-          <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
+          <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ WORLD THREAT LEVEL</span>
+          <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
-        <button onClick={fetchNews} className="text-[10px] font-mono text-[#d7b36a] hover:underline text-left mt-2">Retry ↗</button>
+        <button onClick={fetchNews} className="font-mono text-[#d7b36a] hover:underline text-left mt-2" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>Retry ↗</button>
       </>
     )
   }
@@ -80,31 +80,31 @@ export default function PHNewsWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ WORLD THREAT LEVEL</span>
+        <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ WORLD THREAT LEVEL</span>
         <div className="flex items-center gap-2">
-          {cached && <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.15em]">CACHED</span>}
-          <button onClick={fetchNews} className="text-[9px] font-mono text-[#6b5a30] hover:text-[#d7b36a] transition-colors">↻</button>
+          {cached && <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#6b5a30] uppercase tracking-[0.15em]">CACHED</span>}
+          <button onClick={fetchNews} className="font-mono text-[#6b5a30] hover:text-[#d7b36a] transition-colors" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>↻</button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto max-h-[160px] space-y-1.5">
+      <div className="flex-1 overflow-y-auto space-y-1.5">
         {news.length === 0 ? (
-          <div className="text-[11px] font-mono text-[#6b5a30]">&gt; NO INTEL AVAILABLE.</div>
+          <div className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}>&gt; NO INTEL AVAILABLE.</div>
         ) : (
           news.map((item, i) => {
             const attrs = urgencyAttrs(item.urgency)
             return (
               <div key={i} className="border-l-2 pl-2 py-1" style={{ borderColor: attrs.color }}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span
-                    className="text-[8px] font-mono uppercase tracking-[0.15em] px-1 py-0.5 shrink-0"
-                    style={{ color: attrs.color, backgroundColor: `${attrs.color}15` }}
+                    className="font-mono uppercase tracking-[0.15em] px-1 py-0.5 shrink-0"
+                    style={{ color: attrs.color, backgroundColor: `${attrs.color}15`, fontSize: 'clamp(6px,1cqw,8px)' }}
                   >
                     [{attrs.label}]
                   </span>
-                  <span className="text-[8px] font-mono text-[#6b5a30] uppercase tracking-[0.1em] shrink-0">[{item.category?.toUpperCase() || 'GENERAL'}]</span>
+                  <span className="font-mono text-[#6b5a30] uppercase tracking-[0.1em] shrink-0" style={{ fontSize: 'clamp(6px,1cqw,8px)' }}>[{item.category?.toUpperCase() || 'GENERAL'}]</span>
                 </div>
-                <div className="text-[11px] font-mono text-[#f7f1e4] mt-0.5">{item.title}</div>
-                <div className="text-[10px] font-mono text-[#6b5a30] mt-0.5">{item.summary}</div>
+                <div className="font-mono text-[#f7f1e4] mt-0.5" style={{ fontSize: 'clamp(10px,1.7cqw,12px)' }}>{item.title}</div>
+                <div className="font-mono text-[#6b5a30] mt-0.5 line-clamp-2" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>{item.summary}</div>
               </div>
             )
           })

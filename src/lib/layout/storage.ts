@@ -78,18 +78,19 @@ export function reconcileLayouts(
 export function loadLayouts(page: LayoutPage, defaults: Layouts): Layouts {
   const primaryKey = LAYOUT_STORAGE_KEYS[page]
   const fromPrimary = readRaw(primaryKey)
-  if (fromPrimary) return reconcileLayouts(fromPrimary, defaults)
+  if (fromPrimary) return normalizeLayouts(reconcileLayouts(fromPrimary, defaults))
 
   for (const legacyKey of LAYOUT_LEGACY_KEYS[page]) {
     const fromLegacy = readRaw(legacyKey)
     if (fromLegacy) {
       const reconciled = reconcileLayouts(fromLegacy, defaults)
-      saveLayouts(page, reconciled)
-      return reconciled
+      const normalized = normalizeLayouts(reconciled)
+      saveLayouts(page, normalized)
+      return normalized
     }
   }
 
-  return defaults
+  return normalizeLayouts(defaults)
 }
 
 export function saveLayouts(page: LayoutPage, layouts: Layouts): void {

@@ -72,7 +72,7 @@ export default function MainPage() {
           return (
             <div
               key={item.i}
-              className={`widget-shell-group transition-all duration-200 ${switchMode ? 'cursor-pointer' : ''}`}
+              className={`widget-shell-group ${switchMode ? 'cursor-pointer' : ''} ${isSelected ? 'swap-selected' : ''}`}
               onClick={() => handleWidgetClick(item.i)}
             >
               <div className={`hud-card h-full flex flex-col ${isSelected ? 'ring-2 ring-[var(--sl-gold)] ring-offset-2 ring-offset-[#06060a]' : ''}`}>

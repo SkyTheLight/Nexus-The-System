@@ -73,11 +73,11 @@ export default function TasksWidget() {
     return (
       <>
         <div className="hud-card-header drag-handle">
-          <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
-          <span className="text-[8px] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
+          <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
+          <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#ef4444] uppercase tracking-[0.15em]">ERROR</span>
         </div>
         <div className="flex-1 flex flex-col justify-center">
-          <button onClick={fetchTasks} className="text-[10px] font-mono text-[#d7b36a] hover:underline text-left">Retry ↗</button>
+          <button onClick={fetchTasks} className="font-mono text-[#d7b36a] hover:underline text-left" style={{ fontSize: 'clamp(8px,1.4cqw,10px)' }}>Retry ↗</button>
         </div>
       </>
     )
@@ -86,15 +86,15 @@ export default function TasksWidget() {
   return (
     <>
       <div className="hud-card-header">
-        <span className="text-[9px] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
-        <span className="text-[8px] font-mono text-[#22c55e] uppercase tracking-[0.15em]">
+        <span className="text-[clamp(7px,1.2cqw,9px)] font-mono text-[#d7b36a] uppercase tracking-[0.25em]">■ DAILY OBJECTIVES</span>
+        <span className="text-[clamp(6px,1cqw,8px)] font-mono text-[#22c55e] uppercase tracking-[0.15em]">
           {tasks.length === 0 ? 'ALL CLEAR' : `${tasks.length} ACTIVE`}
         </span>
       </div>
       <div className="flex-1 flex flex-col">
         <div className="flex-1 space-y-1.5">
           {tasks.length === 0 ? (
-            <div className="text-[13px] font-mono text-[#22c55e]">OBJECTIVES COMPLETE. WELL DONE, HUNTER.</div>
+            <div className="font-mono text-[#22c55e]" style={{ fontSize: 'clamp(10px,2cqw,13px)' }}>OBJECTIVES COMPLETE. WELL DONE, HUNTER.</div>
           ) : (
             tasks.map(task => (
               <div key={task.id} className="flex items-center gap-2 group"
@@ -102,11 +102,12 @@ export default function TasksWidget() {
               >
                 <button
                   onClick={() => toggleComplete(task.id)}
-                  className="w-4 h-4 border border-[#1a1a2e] hover:border-[#d7b36a] transition-colors duration-150 shrink-0 flex items-center justify-center font-mono text-[10px] text-[#6b5a30] group-hover:text-[#d7b36a]"
+                  className="border border-[#1a1a2e] hover:border-[#d7b36a] transition-colors duration-150 shrink-0 flex items-center justify-center font-mono text-[#6b5a30] group-hover:text-[#d7b36a]"
+                  style={{ width: 'clamp(14px,2.5cqw,16px)', height: 'clamp(14px,2.5cqw,16px)', fontSize: 'clamp(8px,1.3cqw,10px)' }}
                 >
                   [&nbsp;]
                 </button>
-                <span className="text-[12px] font-mono text-[#f7f1e4] truncate">{task.title}</span>
+                <span className="font-mono text-[#f7f1e4] truncate" style={{ fontSize: 'clamp(10px,1.8cqw,12px)' }}>{task.title}</span>
               </div>
             ))
           )}
@@ -117,18 +118,20 @@ export default function TasksWidget() {
           className="mt-2 pt-2 border-t border-[#1a1a2e]"
         >
           <div className="flex items-center gap-1">
-            <span className="text-[10px] font-mono text-[#6b5a30]">&gt;</span>
+            <span className="font-mono text-[#6b5a30]" style={{ fontSize: 'clamp(8px,1.3cqw,10px)' }}>&gt;</span>
             <input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="ADD OBJECTIVE..."
-              className="flex-1 bg-transparent border-none px-1 py-1 text-[11px] font-mono text-[#f7f1e4] placeholder:text-[#6b5a30] outline-none"
+              className="flex-1 bg-transparent border-none px-1 py-1 font-mono text-[#f7f1e4] placeholder:text-[#6b5a30] outline-none"
+              style={{ fontSize: 'clamp(9px,1.5cqw,11px)' }}
               disabled={adding}
             />
             <button
               type="submit"
               disabled={!newTitle.trim() || adding}
-              className="text-[9px] font-mono text-[#6b5a30] hover:text-[#d7b36a] disabled:opacity-30 transition-colors uppercase tracking-[0.15em]"
+              className="font-mono text-[#6b5a30] hover:text-[#d7b36a] disabled:opacity-30 transition-colors uppercase tracking-[0.15em]"
+              style={{ fontSize: 'clamp(7px,1.1cqw,9px)' }}
             >
               ADD
             </button>
