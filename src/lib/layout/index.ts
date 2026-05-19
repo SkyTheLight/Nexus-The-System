@@ -29,3 +29,28 @@ export {
   layoutToConstraints,
   type WidgetConstraint,
 } from './constraintFlow'
+
+// NEXUS - Node-Based Elastic Expression of Unified Space
+export {
+  NexusEngine,
+  NexusGraph,
+  PressureSystem,
+  ConstraintSolver,
+  type NexusWidget,
+  type FlexBehavior,
+  type SizeBounds,
+  type RelationalConstraint,
+  type LayoutPosition,
+  type LayoutSolution,
+  type PressureSignal,
+  type ConstraintConflict,
+} from './nexus'
+
+export {
+  NexusAdapter,
+  createNexusWidget,
+  NexusWidgetPresets,
+  layoutToNexusWidgets,
+  nexusLayoutToRGL,
+  rglToPxPosition,
+} from './nexusAdapter'
