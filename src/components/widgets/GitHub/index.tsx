@@ -21,7 +21,7 @@ export default function GitHubWidget() {
     },
   });
 
-  if (isLoading) return <div className="bg-[#0B0B0C] border border-white/10 rounded-2xl p-6">Loading...</div>;
+  if (isLoading) return <div className="h-full bg-[#0B0B0C] border border-white/10 rounded-2xl p-6">Loading...</div>;
 
   const commits: Commit[] = events?.filter((e: any) => e.type === 'PushEvent')
     ?.flatMap((e: any) =>
@@ -35,7 +35,7 @@ export default function GitHubWidget() {
     ?.slice(0, 5) || [];
 
   return (
-    <div className="bg-[#0B0B0C] border border-white/10 rounded-2xl p-6">
+    <div className="h-full flex flex-col bg-[#0B0B0C] border border-white/10 rounded-2xl p-6">
       <div className="flex items-center gap-2 mb-4">
         <Github className="w-5 h-5" />
         <h3 className="text-lg font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">

@@ -76,7 +76,7 @@ export default function AssignmentWidget() {
 
 
   return (
-    <div className="bg-[#0B0B0C] border border-white/10 rounded-2xl p-6">
+    <div className="h-full flex flex-col bg-[#0B0B0C] border border-white/10 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
           Assignments

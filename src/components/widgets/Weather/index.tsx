@@ -12,9 +12,9 @@ const iconMap: Record<string, any> = {
 export default function WeatherWidget() {
   const { weather, loading, error, refetch, usingPreset, selectedLocationIndex, switchLocation, locationPresets } = useWeather()
 
-  if (loading) return <div className="text-muted-foreground text-sm p-4">LOADING...</div>
-  if (error) return <div className="text-muted-foreground text-sm p-4">{error}</div>
-  if (!weather) return <div className="text-muted-foreground text-sm p-4">Weather unavailable.</div>
+  if (loading) return <div className="h-full text-muted-foreground text-sm p-4">LOADING...</div>
+  if (error) return <div className="h-full text-muted-foreground text-sm p-4">{error}</div>
+  if (!weather) return <div className="h-full text-muted-foreground text-sm p-4">Weather unavailable.</div>
 
   const IconComponent = iconMap[weather.weatherInfo.icon] || Cloud
 
