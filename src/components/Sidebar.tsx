@@ -61,21 +61,27 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen sidebar transition-all duration-300 ${
-        sidebarOpen ? 'w-64' : 'w-16'
+      className={`fixed left-0 top-0 h-screen sidebar transition-all duration-250 ease-in-out ${
+        sidebarOpen ? 'w-[220px]' : 'w-[56px]'
       }`}
     >
       <div className="flex flex-col h-full">
-        <div className="p-4 border-b border-[#ffffff0f] flex items-center justify-between">
-          {sidebarOpen && <span className="font-semibold text-lg text-white">Adversity</span>}
+        {/* Logo */}
+        <div className="p-4 border-b border-[var(--sl-border)] flex items-center justify-between">
+          {sidebarOpen && (
+            <span className="font-['Cinzel'] text-base text-[var(--sl-gold)] tracking-widest uppercase">
+              ◈ SYSTEM
+            </span>
+          )}
           <button
             onClick={toggleSidebar}
-            className="p-1 hover:bg-[#ffffff0f] rounded-md transition-colors"
+            className="p-1 hover:bg-[var(--sl-gold-dim)] rounded transition-colors text-[var(--sl-text-muted)] hover:text-[var(--sl-gold)]"
           >
             {sidebarOpen ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
           </button>
         </div>
 
+        {/* Navigation */}
         <nav className="flex-1 py-4 overflow-y-auto">
           {navigation.map((section, index) => (
             <div key={section.section}>
@@ -83,18 +89,21 @@ export default function Sidebar() {
               {sidebarOpen && (
                 <div className="sidebar-section-label mt-2">{section.section}</div>
               )}
-              {section.items.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`sidebar-item ${
-                    pathname === item.href ? 'active' : ''
-                  }`}
-                >
-                  <item.icon size={16} />
-                  {sidebarOpen && <span>{item.label}</span>}
-                </Link>
-              ))}
+              {section.items.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`sidebar-item ${isActive ? 'active' : ''}`}
+                  >
+                    <item.icon size={16} className={isActive ? 'text-[var(--sl-gold)]' : ''} />
+                    {sidebarOpen && (
+                      <span className="text-[11px] uppercase tracking-wider truncate">{item.label}</span>
+                    )}
+                  </Link>
+                )
+              })}
             </div>
           ))}
         </nav>

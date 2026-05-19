@@ -1,9 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react"
-import { GridLayout, type Layouts, type Layout } from "react-grid-layout"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { Responsive as ResponsiveGridLayout } from "react-grid-layout"
+import type { Layouts, Layout } from "react-grid-layout"
 import "react-grid-layout/css/styles.css"
 import "react-resizable/css/styles.css"
+
+const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
+const COLS        = { lg: 12,   md: 10,  sm: 6,   xs: 4,   xxs: 2 }
 
 interface GridWrapperProps {
   layouts: Layouts
@@ -12,28 +16,7 @@ interface GridWrapperProps {
   rowHeight?: number
   margin?: [number, number]
   draggableHandle?: string
-}
-
-const breakpoints = [
-  { key: "lg", minWidth: 1200, cols: 12 },
-  { key: "md", minWidth: 996, cols: 10 },
-  { key: "sm", minWidth: 768, cols: 6 },
-  { key: "xs", minWidth: 480, cols: 4 },
-  { key: "xxs", minWidth: 0, cols: 2 },
-]
-
-function getBreakpoint(w: number): string {
-  for (const bp of breakpoints) {
-    if (w >= bp.minWidth) return bp.key
-  }
-  return "xxs"
-}
-
-function getCols(w: number): number {
-  for (const bp of breakpoints) {
-    if (w >= bp.minWidth) return bp.cols
-  }
-  return 2
+  onBreakpointChange?: (bp: string, cols: number) => void
 }
 
 export function GridWrapper({
@@ -43,68 +26,58 @@ export function GridWrapper({
   rowHeight = 72,
   margin = [12, 12],
   draggableHandle = ".widget-drag-bar",
+  onBreakpointChange,
 }: GridWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
   const measure = useCallback(() => {
-    if (containerRef.current) {
-      const w = containerRef.current.getBoundingClientRect().width
-      if (w > 0) setWidth(w)
-    }
+    if (!containerRef.current) return
+    const w = containerRef.current.getBoundingClientRect().width
+    if (w > 0) setWidth(w)
   }, [])
 
   useEffect(() => {
+    setMounted(true)
     measure()
     const t1 = setTimeout(measure, 50)
-    const t2 = setTimeout(measure, 200)
+    const t2 = setTimeout(measure, 250)
     const ro = new ResizeObserver(measure)
     if (containerRef.current) ro.observe(containerRef.current)
     window.addEventListener("resize", measure)
     return () => {
-      clearTimeout(t1)
-      clearTimeout(t2)
+      clearTimeout(t1); clearTimeout(t2)
       ro.disconnect()
       window.removeEventListener("resize", measure)
     }
   }, [measure])
 
-  const currentLayout = useMemo(() => {
-    if (width === 0) return []
-    const bp = getBreakpoint(width)
-    return layouts[bp] || layouts.lg || []
-  }, [layouts, width])
-
-  const handleLayoutChange = useCallback(
-    (newLayout: Layout[]) => {
-      if (width === 0) return
-      const bp = getBreakpoint(width)
-      const updated = { ...layouts, [bp]: newLayout }
-      onLayoutChange(newLayout, updated)
-    },
-    [layouts, width, onLayoutChange]
-  )
-
-  if (width === 0 || currentLayout.length === 0) {
-    return <div ref={containerRef} style={{ width: "100%", minHeight: "400px" }} />
-  }
+  if (!mounted) return <div ref={containerRef} style={{ width: "100%", minHeight: 400 }} />
 
   return (
-    <div ref={containerRef} style={{ width: "100%", minHeight: "400px" }}>
-      <GridLayout
-        width={width}
-        layout={currentLayout}
-        cols={getCols(width)}
-        rowHeight={rowHeight}
-        margin={margin}
-        onLayoutChange={handleLayoutChange}
-        isDraggable={true}
-        isResizable={true}
-        draggableHandle={draggableHandle}
-        compactType={null}
-      >
-        {children}
-      </GridLayout>
+    <div ref={containerRef} style={{ width: "100%" }}>
+      {width > 0 && (
+        <ResponsiveGridLayout
+          width={width}
+          layouts={layouts}
+          breakpoints={BREAKPOINTS}
+          cols={COLS}
+          rowHeight={rowHeight}
+          margin={margin}
+          compactType="vertical"
+          isDraggable
+          isResizable
+          draggableHandle={draggableHandle}
+          draggableCancel="button, input, textarea, select, a, [role='button'], .widget-no-drag"
+          resizeHandles={["se", "sw", "ne", "nw", "e", "w", "s", "n"]}
+          useCSSTransforms
+          onLayoutChange={onLayoutChange}
+          onBreakpointChange={onBreakpointChange}
+        >
+          {children}
+        </ResponsiveGridLayout>
+      )}
     </div>
   )
 }

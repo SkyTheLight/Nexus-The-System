@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-export default function TopNav() {
+interface TopNavProps {
+  onResetLayout?: () => void
+}
+
+export default function TopNav({ onResetLayout }: TopNavProps) {
   const pathname = usePathname()
   const [time, setTime] = useState('')
 
@@ -25,32 +29,41 @@ export default function TopNav() {
   }, [])
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#06060a] border-b border-[rgba(215,179,106,0.18)] px-6 h-10 flex items-center justify-between">
-      <div className="flex items-center gap-5 text-xs font-mono">
+    <nav className="sticky top-0 z-50 h-[40px] bg-[#05050d] border-b border-[var(--sl-border)] px-6 flex items-center justify-between">
+      <div className="flex items-center gap-5 text-xs">
         <Link
           href="/main"
-          className={`tracking-wider uppercase transition-colors duration-150 ${
+          className={`font-['Cinzel'] tracking-widest uppercase transition-colors duration-150 ${
             pathname.startsWith('/main')
-              ? 'text-[#d7b36a]'
-              : 'text-[#555] hover:text-[#888]'
+              ? 'text-[var(--sl-gold)]'
+              : 'text-[var(--sl-text-muted)] hover:text-[var(--sl-gold)]'
           }`}
         >
           MAIN
         </Link>
-        <span className="text-[#1f1f1f]">|</span>
+        <span className="text-[var(--sl-text-dim)]">◈</span>
         <Link
           href="/hub"
-          className={`tracking-wider uppercase transition-colors duration-150 ${
+          className={`font-['Cinzel'] tracking-widest uppercase transition-colors duration-150 ${
             pathname.startsWith('/hub')
-              ? 'text-[#d7b36a]'
-              : 'text-[#555] hover:text-[#888]'
+              ? 'text-[var(--sl-gold)]'
+              : 'text-[var(--sl-text-muted)] hover:text-[var(--sl-gold)]'
           }`}
         >
           HUB
         </Link>
       </div>
-      <div className="flex items-center gap-3 text-xs font-mono">
-        <span className="text-[#555] tabular-nums">{time}</span>
+      <div className="flex items-center gap-3 text-xs font-['JetBrains_Mono']">
+        {onResetLayout && (
+          <button
+            onClick={onResetLayout}
+            className="text-[var(--sl-text-muted)] hover:text-[var(--sl-gold)] transition-colors uppercase tracking-wider text-[10px]"
+          >
+            [ RESET ]
+          </button>
+        )}
+        <span className="text-[var(--sl-text-dim)]">[PH TIME]</span>
+        <span className="text-[var(--sl-gold)] tabular-nums">{time}</span>
       </div>
     </nav>
   )

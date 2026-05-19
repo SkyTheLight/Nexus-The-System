@@ -5,16 +5,11 @@ import { GridWrapper } from '@/components/shared/GridWrapper'
 import { useGridLayout } from '@/hooks/useGridLayout'
 import WidgetShell from './WidgetShell'
 import { WIDGET_REGISTRY } from '@/lib/widgetRegistry'
-import {
-  HUB_DEFAULT_LAYOUTS,
-  HUB_GRID,
-  layoutsForVisible,
-  mergeLayoutsPreservingHidden,
-} from '@/lib/layout'
+import { HUB_DEFAULT_LAYOUTS, HUB_GRID, layoutsForVisible } from '@/lib/layout'
 
 interface DashboardGridProps {
   visibleWidgetIds: string[]
-  onHide: (id: string) => void
+  onHide:   (id: string) => void
   onDelete: (id: string) => void
 }
 
@@ -22,7 +17,6 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: Da
   const { layouts, handleLayoutChange, loaded } = useGridLayout({
     page: 'hub',
     defaultLayouts: HUB_DEFAULT_LAYOUTS,
-    beforePersist: mergeLayoutsPreservingHidden,
   })
 
   const registryById = useMemo(() => new Map(WIDGET_REGISTRY.map(w => [w.id, w])), [])
@@ -32,9 +26,11 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: Da
     [layouts, visibleWidgetIds]
   )
 
-  if (!loaded) {
-    return <div className="text-[var(--color-text-muted)] text-sm">Loading grid...</div>
-  }
+  if (!loaded) return (
+    <div className="text-[var(--sl-text-muted)] font-mono text-xs tracking-widest py-8 text-center uppercase">
+      ◈ Initializing System...
+    </div>
+  )
 
   return (
     <GridWrapper
@@ -50,12 +46,7 @@ export default function DashboardGrid({ visibleWidgetIds, onHide, onDelete }: Da
         const Component = entry.component
         return (
           <div key={id} className="widget-shell-group">
-            <WidgetShell
-              id={id}
-              label={entry.label}
-              onHide={() => onHide(id)}
-              onDelete={() => onDelete(id)}
-            >
+            <WidgetShell id={id} label={entry.label} onHide={() => onHide(id)} onDelete={() => onDelete(id)}>
               <Component />
             </WidgetShell>
           </div>
