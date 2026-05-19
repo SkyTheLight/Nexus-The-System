@@ -3,9 +3,10 @@
 import React, { useState, useRef, useEffect, useCallback } from "react"
 import type { Layout, Layouts } from "react-grid-layout"
 
-const EDGE = 15
-const MIN = 100
+const HANDLE = 10
 const COLS = 12
+const MIN_COLS = 2
+const MIN_ROWS = 2
 
 function loadPos(key: string): Map<string, { x: number; y: number; width: number; height: number }> | null {
   try {
@@ -34,6 +35,11 @@ function toGrid(id: string, p: { x: number; y: number; width: number; height: nu
   }
 }
 
+function snapToGrid(px: number, cell: number, mg: number): number {
+  const step = cell + mg
+  return Math.round(px / step) * step
+}
+
 function posEqual(a: Map<string, { x: number; y: number; width: number; height: number }>, b: Map<string, { x: number; y: number; width: number; height: number }>): boolean {
   if (a.size !== b.size) return false
   for (const [id, pa] of a) {
@@ -43,6 +49,27 @@ function posEqual(a: Map<string, { x: number; y: number; width: number; height: 
   }
   return true
 }
+
+const handleStyle = {
+  position: 'absolute' as const,
+  width: HANDLE,
+  height: HANDLE,
+  background: 'rgba(168,85,247,0.5)',
+  border: '1px solid rgba(168,85,247,0.8)',
+  zIndex: 10,
+  borderRadius: 1,
+}
+
+const handles = [
+  { key: 'tl', style: { top: -HANDLE/2, left: -HANDLE/2, cursor: 'nwse-resize' } },
+  { key: 'tr', style: { top: -HANDLE/2, right: -HANDLE/2, cursor: 'nesw-resize' } },
+  { key: 'bl', style: { bottom: -HANDLE/2, left: -HANDLE/2, cursor: 'nesw-resize' } },
+  { key: 'br', style: { bottom: -HANDLE/2, right: -HANDLE/2, cursor: 'nwse-resize' } },
+  { key: 'tm', style: { top: -HANDLE/2, left: '50%', marginLeft: -HANDLE/2, cursor: 'ns-resize' } },
+  { key: 'bm', style: { bottom: -HANDLE/2, left: '50%', marginLeft: -HANDLE/2, cursor: 'ns-resize' } },
+  { key: 'ml', style: { left: -HANDLE/2, top: '50%', marginTop: -HANDLE/2, cursor: 'ew-resize' } },
+  { key: 'mr', style: { right: -HANDLE/2, top: '50%', marginTop: -HANDLE/2, cursor: 'ew-resize' } },
+]
 
 export function GridWrapper({
   layouts,
@@ -64,10 +91,10 @@ export function GridWrapper({
   const [width, setWidth] = useState(0)
   const [widgets, setWidgets] = useState<Map<string, { x: number; y: number; width: number; height: number }>>(new Map())
   const [actId, setActId] = useState<string | null>(null)
+  const [gridSize, setGridSize] = useState<{ w: number; h: number } | null>(null)
   const wRef = useRef(widgets)
   wRef.current = widgets
 
-  /* Stable layout key to prevent effect re-runs */
   const prevKeyRef = useRef("")
   const layoutKey = JSON.stringify(layouts.lg?.map(i => ({ i: i.i, x: i.x, y: i.y, w: i.w, h: i.h })))
 
@@ -94,7 +121,6 @@ export function GridWrapper({
     return () => window.removeEventListener("beforeunload", flush)
   }, [persistenceKey, flushReady])
 
-  /* Initialise / reconcile pixel positions from layout */
   useEffect(() => {
     if (!mounted || width === 0) return
     if (layoutKey === prevKeyRef.current) return
@@ -123,7 +149,7 @@ export function GridWrapper({
     }
   }, [mounted, width, layoutKey, persistenceKey, rowHeight, margin])
 
-  /* ── Drag / Resize ── */
+  /* ── Drag / Resize with grid snapping ── */
   const onDown = useCallback((e: React.MouseEvent, id: string) => {
     e.preventDefault()
     e.stopPropagation()
@@ -133,45 +159,84 @@ export function GridWrapper({
     const start = wRef.current.get(id)
     if (!start) return
 
-    const el = e.currentTarget as HTMLElement
-    const rect = el.getBoundingClientRect()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const rx = e.clientX - rect.left
     const ry = e.clientY - rect.top
-    const nr = rx > rect.width - EDGE
-    const nb = ry > rect.height - EDGE
-    const nl = rx < EDGE
-    const nt = ry < EDGE
-    const isResize = nr || nb || nl || nt
+
+    const cw = width > 0 ? (width - margin[0] * (COLS - 1)) / COLS : 100
+    const cellW = cw + margin[0]
+    const cellH = rowHeight + margin[0]
+
+    let dragMode: 'move' | 'resize-tl' | 'resize-tr' | 'resize-bl' | 'resize-br' | 'resize-t' | 'resize-b' | 'resize-l' | 'resize-r' = 'move'
+    if (ry < HANDLE && rx < HANDLE) dragMode = 'resize-tl'
+    else if (ry < HANDLE && rx > rect.width - HANDLE) dragMode = 'resize-tr'
+    else if (ry > rect.height - HANDLE && rx < HANDLE) dragMode = 'resize-bl'
+    else if (ry > rect.height - HANDLE && rx > rect.width - HANDLE) dragMode = 'resize-br'
+    else if (ry < HANDLE) dragMode = 'resize-t'
+    else if (ry > rect.height - HANDLE) dragMode = 'resize-b'
+    else if (rx < HANDLE) dragMode = 'resize-l'
+    else if (rx > rect.width - HANDLE) dragMode = 'resize-r'
 
     const sx = e.clientX
     const sy = e.clientY
+    const isResize = dragMode !== 'move'
 
     const onMove = (me: MouseEvent) => {
       const dx = me.clientX - sx
       const dy = me.clientY - sy
-      if (!isResize) {
-        setActId(id)
-        setWidgets(prev => {
-          const cur = prev.get(id)
-          if (!cur) return prev
-          const next = new Map(prev)
-          next.set(id, { ...cur, x: Math.max(0, start.x + dx), y: Math.max(0, start.y + dy) })
-          return next
-        })
+      setActId(id)
+      setWidgets(prev => {
+        const cur = prev.get(id)
+        if (!cur) return prev
+        let nx = start.x, ny = start.y, nw = start.width, nh = start.height
+
+        if (!isResize) {
+          nx = Math.max(0, start.x + dx)
+          ny = Math.max(0, start.y + dy)
+        } else {
+          const minPxW = MIN_COLS * cw + (MIN_COLS - 1) * margin[0]
+          const minPxH = MIN_ROWS * rowHeight + (MIN_ROWS - 1) * margin[0]
+
+          if (dragMode.includes('r')) {
+            const raw = start.width + dx
+            const snapped = snapToGrid(start.x + raw, cw, margin[0]) - snapToGrid(start.x, cw, margin[0])
+            nw = Math.max(minPxW, snapped)
+          }
+          if (dragMode.includes('l')) {
+            const right = start.x + start.width
+            const rawW = start.width - dx
+            const snapped = snapToGrid(right, cw, margin[0]) - snapToGrid(right - rawW, cw, margin[0])
+            nw = Math.max(minPxW, snapped)
+            nx = right - nw
+          }
+          if (dragMode.includes('b')) {
+            const raw = start.height + dy
+            const snapped = snapToGrid(start.y + raw, rowHeight, margin[0]) - snapToGrid(start.y, rowHeight, margin[0])
+            nh = Math.max(minPxH, snapped)
+          }
+          if (dragMode.includes('t')) {
+            const bottom = start.y + start.height
+            const rawH = start.height - dy
+            const snapped = snapToGrid(bottom, rowHeight, margin[0]) - snapToGrid(bottom - rawH, rowHeight, margin[0])
+            nh = Math.max(minPxH, snapped)
+            ny = bottom - nh
+          }
+        }
+
+        const next = new Map(prev)
+        next.set(id, { x: Math.max(0, nx), y: Math.max(0, ny), width: nw, height: nh })
+        return next
+      })
+
+      if (isResize) {
+        const cur = wRef.current.get(id)
+        if (cur) {
+          const gw = Math.max(MIN_COLS, Math.min(COLS, Math.round((cur.width + margin[0]) / cellW)))
+          const gh = Math.max(MIN_ROWS, Math.round((cur.height + margin[0]) / cellH))
+          setGridSize({ w: gw, h: gh })
+        }
       } else {
-        setActId(id)
-        setWidgets(prev => {
-          const cur = prev.get(id)
-          if (!cur) return prev
-          let nx = start.x, ny = start.y, nw = start.width, nh = start.height
-          if (nr) nw = Math.max(MIN, start.width + dx)
-          if (nb) nh = Math.max(MIN, start.height + dy)
-          if (nl) { const dw = -dx; if (start.width + dw >= MIN) { nw = start.width + dw; nx = start.x - dw } }
-          if (nt) { const dh = -dy; if (start.height + dh >= MIN) { nh = start.height + dh; ny = start.y - dh } }
-          const next = new Map(prev)
-          next.set(id, { x: Math.max(0, nx), y: Math.max(0, ny), width: nw, height: nh })
-          return next
-        })
+        setGridSize(null)
       }
     }
 
@@ -179,6 +244,7 @@ export function GridWrapper({
       document.removeEventListener("mousemove", onMove)
       document.removeEventListener("mouseup", onUp)
       setActId(null)
+      setGridSize(null)
       savePos(persistenceKey, wRef.current)
 
       const final = wRef.current.get(id)
@@ -221,6 +287,24 @@ export function GridWrapper({
                   userSelect: 'none', touchAction: 'none',
                 }}
               >
+                {/* Resize handles (visible on hover via opacity) */}
+                {handles.map(h => (
+                  <div
+                    key={h.key}
+                    className="resize-handle"
+                    style={{ ...handleStyle, ...h.style, opacity: 0 }}
+                  />
+                ))}
+
+                {/* Active dimension label */}
+                {active && gridSize && (
+                  <div
+                    className="absolute top-1 left-1/2 -translate-x-1/2 z-20 px-2 py-0.5 bg-[#a855f7] text-[10px] font-mono text-black font-bold rounded pointer-events-none"
+                  >
+                    {gridSize.w}&times;{gridSize.h}
+                  </div>
+                )}
+
                 {React.Children.map(children, (ch) => {
                   if (React.isValidElement(ch) && String(ch.key) === id) return ch
                   return null
@@ -230,6 +314,9 @@ export function GridWrapper({
           })}
         </div>
       )}
+      <style>{`
+        .absolute:hover > .resize-handle { opacity: 1 !important; }
+      `}</style>
     </div>
   )
 }
