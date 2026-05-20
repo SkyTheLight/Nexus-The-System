@@ -50,7 +50,7 @@ export default function DashboardGrid({
             className={`widget-shell-group transition-all duration-200 ${switchMode ? 'cursor-pointer' : ''}`}
             onClick={() => onWidgetClick?.(id)}
           >
-            <div className={`relative ${isSelected ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--color-bg)]' : ''}`}>
+            <div className={`relative h-full ${isSelected ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--color-bg)]' : ''}`}>
               {switchMode && (
                 <div className="absolute top-2 right-2 z-10 w-5 h-5 rounded-full bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/40 flex items-center justify-center">
                   <Check size={10} className="text-[var(--color-accent)]" />
