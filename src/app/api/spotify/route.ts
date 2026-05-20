@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET
-const SPOTIFY_REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN
+const ENV_REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN
 
-async function getAccessToken() {
-  // If refresh token available, use it
-  if (SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET && SPOTIFY_REFRESH_TOKEN) {
+async function getAccessToken(refreshToken?: string | null) {
+  const token = refreshToken || ENV_REFRESH_TOKEN
+  if (SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET && token) {
     try {
       const response = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
@@ -16,7 +16,7 @@ async function getAccessToken() {
         },
         body: new URLSearchParams({
           grant_type: 'refresh_token',
-          refresh_token: SPOTIFY_REFRESH_TOKEN
+          refresh_token: token
         }).toString()
       })
       const data = await response.json()
@@ -45,7 +45,9 @@ async function getAccessToken() {
 
 export async function GET(request: NextRequest) {
   try {
-    const token = await getAccessToken()
+    const { searchParams } = new URL(request.url)
+    const userRefreshToken = searchParams.get('refreshToken')
+    const token = await getAccessToken(userRefreshToken)
     
     if (!token) {
       return NextResponse.json({ 
